@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Mindbridge-innovations/backend/issues"
   },
-  "homepage": "https://github.com/Mindbridge-innovations/backend#readme"
+  "homepage": "https://github.com/Mindbridge-innovations/backend#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
