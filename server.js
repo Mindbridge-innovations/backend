@@ -1,9 +1,9 @@
 const express = require('express');
 require('dotenv').config();
-const {firebaseApp} = require("./utils/firebaseConfig") 
+const cors = require('cors');
 
-
-const db = getDatabase(firebaseApp);
+app.use(cors());
+app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
