@@ -2,9 +2,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { getDatabase, ref, get } = require('firebase/database');
-const { firebaseApp } = require('./firebaseConfig'); // Make sure to export the Firebase app instance
+const { firebaseApp } = require('./firebaseConfig'); 
 
-const secretKey = process.env.JWT_SECRET || 'yourSecretKey'; // Provide a secure secret key in production
+const secretKey = process.env.JWT_SECRET || 'yourSecretKey'; 
 
 const loginUser = async (email, password) => {
     try {
