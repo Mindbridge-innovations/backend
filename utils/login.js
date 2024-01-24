@@ -7,31 +7,39 @@ const { firebaseApp } = require('./firebaseConfig'); // Make sure to export the 
 const secretKey = process.env.JWT_SECRET || 'yourSecretKey'; // Provide a secure secret key in production
 
 const loginUser = async (email, password) => {
-  try {
-    // Fetch user data from the database based on the provided email
-    const db = getDatabase(firebaseApp);
-    const userRef = ref(db, `users/${email.replace('.', ',')}`);
-    const snapshot = await get(userRef);
-    const userData = snapshot.val();
-
-    if (!userData) {
-      throw new Error('User not found');
+    try {
+      if (typeof email !== 'string') {
+        throw new Error('Email must be a string');
+      }
+  
+      // Fetch user data from the database based on the provided email
+      const db = getDatabase(firebaseApp);
+      const userRef = ref(db, `users/${email.replace(/\./g, ',')}`);
+      const snapshot = await get(userRef);
+      const userData = snapshot.val();
+      console.log(userData);
+      if (!userData) {
+        throw new Error('User not found');
+      }
+  
+      if (!userData.password) {
+        throw new Error('Password not found for the user');
+      }
+  
+      // Compare the provided password with the hashed password stored in the database
+      const passwordMatch = await bcrypt.compare(password, userData.password);
+  
+      if (!passwordMatch) {
+        throw new Error('Invalid password');
+      }
+  
+      // Generate a JWT token
+      const token = jwt.sign({ email }, secretKey, { expiresIn: '1h' });
+  
+      return { token, userData };
+    } catch (error) {
+      console.error(`Error logging in: ${error.message}`); // Log the error for debugging purposes
+      throw error; // Re-throw the error to be handled by the caller
     }
-
-    // Compare the provided password with the hashed password stored in the database
-    const passwordMatch = await bcrypt.compare(password, userData.password);
-
-    if (!passwordMatch) {
-      throw new Error('Invalid password');
-    }
-
-    // Generate a JWT token
-    const token = jwt.sign({ email }, secretKey, { expiresIn: '1h' });
-
-    return { token, userData };
-  } catch (error) {
-    throw new Error('Error logging in');
-  }
-};
-
+  };
 module.exports = { loginUser };
