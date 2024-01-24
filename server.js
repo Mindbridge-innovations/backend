@@ -1,4 +1,5 @@
 const { initializeApp } = require("firebase/app");
+const { getDatabase, ref, set, get } = require("firebase/database");
 const express = require('express');
 require('dotenv').config();
 
