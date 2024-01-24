@@ -9,7 +9,7 @@ const registerUser = async (username, email, password, firstName, lastName, age)
 
     // Save user details to the database (Firebase in this case)
     const db = getDatabase(firebaseApp);
-    const userRef = ref(db, `users/${email.replace('.', ',')}`);
+    const userRef = ref(db, `users/${email.replace(/\./g, ',')}`);
 
     const userData = {
       username,
@@ -24,7 +24,9 @@ const registerUser = async (username, email, password, firstName, lastName, age)
 
     return { success: true, message: 'User registered successfully' };
   } catch (error) {
-    throw new Error('Error registering user');
+    console.log(`Error while trying to create a new user: ${error.message}`);
+    console.error('Error registering user:', error);
+    throw error; 
   }
 };
 
