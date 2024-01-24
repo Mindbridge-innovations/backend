@@ -14,6 +14,14 @@ router.post('/api/register', async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   });
-router.post('/api/login', loginUser);
+  router.post('/api/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const result = await loginUser(email, password);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
 module.exports = router;
