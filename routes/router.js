@@ -14,7 +14,7 @@ router.post('/api/register', async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   });
-
+  
  router.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body; // Extract email and password from request body
