@@ -19,3 +19,21 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     }
 })
+
+const sendEmail = async(email, firstName)=>{
+    const emailContent = mailGenerator.generate({
+        body:{
+            name: firstName,
+            intro: "Welcome to MindBridge! We're very excited to have you on board.",
+            action:{
+                instructions: "To get started with MindBridge, please click here:",
+                button:{
+                    color: "#22BC66",
+                    text: "Confirm your account",
+                    link: `${process.env.CLIENT_URL}/confirm/${email}`
+                }
+            },
+            outro: "Need help, or have questions? Just reply to this email, we'd love to help."
+        }
+    })
+};
