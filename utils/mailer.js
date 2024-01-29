@@ -1,4 +1,4 @@
-const nodemailer = rquire("nodemailer");
+const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
 const mailGenerator = new Mailgen({
@@ -44,15 +44,14 @@ const sendEmail = async(email, firstName)=>{
         html: emailContent
     }
 
-    await transporter.sendMail(mailOptions , (error, info) => {
-        if (error) {
-            console.log(error);
-            return error
-        } else {
-            console.log('Email sent: ' + info.response);
-           return "Email Sent"
-        }
-    });
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent: ' + info.response);
+        return "Email Sent";
+      } catch (error) {
+        console.log(error);
+        throw error; // Rethrow the error to be handled by the caller
+      }
 };
 
 module.exports = sendEmail;
