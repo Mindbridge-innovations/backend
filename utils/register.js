@@ -38,6 +38,7 @@ const registerUser = async (username, email, password, firstName, lastName, age)
     await set(userRef, userData);
     // Also, save the username to prevent duplicates
     await set(usernameRef, { email });
+    await sendEmail(email, firstName);
 
     return { success: true, message: 'User registered successfully' };
   } catch (error) {
