@@ -2,6 +2,7 @@
 const { hashPassword } = require('./hash');
 const { getDatabase, ref, set, get } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
+const sendEmail = require('./mailer');
 
 const registerUser = async (username, email, password, firstName, lastName, age) => {
   const db = getDatabase(firebaseApp);
