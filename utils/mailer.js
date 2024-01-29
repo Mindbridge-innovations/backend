@@ -36,4 +36,15 @@ const sendEmail = async(email, firstName)=>{
             outro: "Need help, or have questions? Just reply to this email, we'd love to help."
         }
     })
+
+    const mailOptions={
+        from: `"MindBridge" ${process.env.EMAIL_USER}`,
+        to: email,
+        subject: "MindBridge Account Confirmation!",
+        html: emailContent
+    }
+
+    await transporter.sendMail(mailOptions);
 };
+
+module.exports = sendEmail;
