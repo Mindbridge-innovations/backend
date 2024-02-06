@@ -5,7 +5,7 @@ const {registerUser} = require('../utils/register')
 const {loginUser} = require('../utils/login')
 
 
-router.post('/api/register', async (req, res) => {
+router.post('/api/register', async (req, res) => {;
     try {
       const { username, email, password, firstName, lastName, age } = req.body;
       const result = await registerUser(username, email, password, firstName, lastName, age);
