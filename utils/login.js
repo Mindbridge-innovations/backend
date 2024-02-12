@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { getDatabase, ref, get } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig'); 
 
-const secretKey = process.env.JWT_SECRET || 'yourSecretKey'; 
+const secretKey = process.env.JWT_SECRET; 
 
 const loginUser = async (email, password) => {
     try {
