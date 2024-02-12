@@ -3,7 +3,8 @@ const express = require('express');
 const router = express.Router();
 const {registerUser} = require('../utils/register')
 const {loginUser} = require('../utils/login')
-
+const generatePasswordResetToken = require('../utils/generatePasswordResetToken');
+const resetPassword = require('../utils/resetPassword');
 
 router.post('/api/register', async (req, res) => {;
     try {
@@ -17,7 +18,7 @@ router.post('/api/register', async (req, res) => {;
   
  router.post('/api/login', async (req, res) => {
   try {
-    const { email, password } = req.body; // Extract email and password from request body
+    const { email, password } = req.body; 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -27,5 +28,27 @@ router.post('/api/register', async (req, res) => {;
     res.status(500).json({ message: error.message });
   }
 });
+
+// Forgot password endpoint
+router.post('/api/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await generatePasswordResetToken(email);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Reset password endpoint
+router.post('/api/reset-password', async (req, res) => {
+  try {
+    const { email, token, newPassword } = req.body;
+    const result = await resetPassword(email, token, newPassword);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
 
 module.exports = router;
