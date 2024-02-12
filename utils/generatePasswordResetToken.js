@@ -27,8 +27,9 @@ const generatePasswordResetToken = async (email) => {
   const mailGenerator = new Mailgen({
     theme: 'default',
     product: {
-      name: 'Your App Name',
-      link: `${process.env.CLIENT_URL}/reset-password/${token}`, // URL to the password reset page in your app
+      name: 'MindBridge',
+      link: 'https://sites.google.com/view/bse24-10/home', // Update with the link to your app
+      logo: 'https://mindbridge-innovations.github.io/assets/images/MindBridgeLogo.jpeg'
     },
   });
 
@@ -41,15 +42,15 @@ const generatePasswordResetToken = async (email) => {
         button: {
           color: '#DC4D2F',
           text: 'Reset Password',
-          link: `${process.env.CLIENT_URL}/reset-password/${token}`,
+          link: `${process.env.CLIENT_URL}/reset-password/${token}`, // Update with the correct link
         },
       },
       outro: 'If you did not request a password reset, no further action is required on your part.',
     },
   });
 
-  // Send the password reset email
-  await sendEmail(email, 'Password Reset', emailTemplate);
+  // Send the password reset email using your sendEmail function
+  await sendEmail(email, userData.firstName || 'User', 'Password Reset', emailTemplate);
 
   return { success: true, message: 'Password reset token sent to email' };
 };
