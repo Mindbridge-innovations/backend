@@ -3,7 +3,6 @@ const crypto = require('crypto');
 const { getDatabase, ref, set, get } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendEmail = require('./mailer');
-const Mailgen = require('mailgen');
 
 const generatePasswordResetToken = async (email) => {
   const db = getDatabase(firebaseApp);
@@ -23,17 +22,11 @@ const generatePasswordResetToken = async (email) => {
   // Save the token and expiration time in the database
   await set(ref(db, `passwordResetTokens/${email.replace(/\./g, ',')}`), { token, expires });
 
-  // Configure Mailgen with a password reset email template
-  const mailGenerator = new Mailgen({
-    theme: 'default',
-    product: {
-      name: 'MindBridge',
-      link: 'https://sites.google.com/view/bse24-10/home', // Update with the link to your app
-      logo: 'https://mindbridge-innovations.github.io/assets/images/MindBridgeLogo.jpeg'
-    },
-  });
+  // Email subject
+  const subject = 'Password Reset Request';
 
-  const emailTemplate = mailGenerator.generate({
+  // Email body content
+  const emailBody = {
     body: {
       name: userData.firstName || email,
       intro: 'You have received this email because a password reset request for your account was received.',
@@ -47,10 +40,10 @@ const generatePasswordResetToken = async (email) => {
       },
       outro: 'If you did not request a password reset, no further action is required on your part.',
     },
-  });
+  };
 
   // Send the password reset email using your sendEmail function
-  await sendEmail(email, userData.firstName || 'User', 'Password Reset', emailTemplate);
+  await sendEmail(email, subject, emailBody);
 
   return { success: true, message: 'Password reset token sent to email' };
 };
