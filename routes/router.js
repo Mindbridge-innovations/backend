@@ -52,4 +52,7 @@ router.post('/api/reset-password', async (req, res) => {
   }
 })
 
+// Protected routes
+router.post('/api/some-protected-route', authenticateToken, someProtectedRouteHandler);
+
 module.exports = router;
