@@ -29,4 +29,15 @@ router.post('/api/register', async (req, res) => {
   }
 });
 
+// Forgot password endpoint
+router.post('/api/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await generatePasswordResetToken(email);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
