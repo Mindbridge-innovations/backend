@@ -3,7 +3,8 @@ const express = require('express');
 const router = express.Router();
 const {registerUser} = require('../utils/register')
 const {loginUser} = require('../utils/login')
-
+const generatePasswordResetToken = require('../utils/generatePasswordResetToken');
+const resetPassword = require('../utils/resetPassword');
 
 router.post('/api/register', async (req, res) => {
     try {
