@@ -5,6 +5,7 @@ const {registerUser} = require('../utils/register')
 const {loginUser} = require('../utils/login')
 const generatePasswordResetToken = require('../utils/generatePasswordResetToken');
 const resetPassword = require('../utils/resetPassword');
+const authenticateToken = require('../middleware/authenticateToken');
 
 router.post('/api/register', async (req, res) => {
     try {
