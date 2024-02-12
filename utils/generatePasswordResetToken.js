@@ -1,26 +1,33 @@
 // utils/generatePasswordResetToken.js
 const crypto = require('crypto');
-const { getDatabase, ref, set, get } = require('firebase/database');
+const { getDatabase, ref, set, get, query, orderByChild, equalTo } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendEmail = require('./mailer');
 
 const generatePasswordResetToken = async (email) => {
   const db = getDatabase(firebaseApp);
-  const userRef = ref(db, `users/${email.replace(/\./g, ',')}`);
-  const snapshot = await get(userRef);
-  const userData = snapshot.val();
 
-  if (!userData) {
+  // Query the database for a user with the specified email
+  const usersRef = ref(db, 'users');
+  const usersQuery = query(usersRef, orderByChild('email'), equalTo(email));
+  const userSnapshot = await get(usersQuery);
+
+  if (!userSnapshot.exists()) {
     throw new Error('User not found');
   }
+
+  // Assuming email is unique, there should only be one match
+  const usersData = userSnapshot.val();
+  const userId = Object.keys(usersData)[0];
+  const userData = usersData[userId];
 
   // Generate a random token
   const token = crypto.randomBytes(20).toString('hex');
   // Set token expiration time (e.g., 1 hour)
   const expires = Date.now() + 3600000;
 
-  // Save the token and expiration time in the database
-  await set(ref(db, `passwordResetTokens/${email.replace(/\./g, ',')}`), { token, expires });
+  // Save the token and expiration time using the userId
+  await set(ref(db, `passwordResetTokens/${userId}`), { token, expires });
 
   // Email subject
   const subject = 'Password Reset Request';
