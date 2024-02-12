@@ -53,6 +53,11 @@ router.post('/api/reset-password', async (req, res) => {
 })
 
 // Protected routes
-router.post('/api/some-protected-route', authenticateToken, someProtectedRouteHandler);
+//router.post('/api/some-protected-route', authenticateToken, someProtectedRouteHandler);
+
+// Dummy protected route
+router.get('/api/dummy', authenticateToken, (req, res) => {
+  res.json({ message: 'You have accessed a protected dummy endpoint!', user: req.user });
+});
 
 module.exports = router;
