@@ -2,7 +2,7 @@
 const { hashPassword } = require('./hash');
 const { getDatabase, ref, set, get } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
-const sendEmail = require('./mailer');
+const sendRegistrationEmail = require('./sendRegistrationEmail');
 
 const registerUser = async (username, email, password, firstName, lastName, age) => {
   const db = getDatabase(firebaseApp);
@@ -38,7 +38,7 @@ const registerUser = async (username, email, password, firstName, lastName, age)
     await set(userRef, userData);
     // Also, save the username to prevent duplicates
     await set(usernameRef, { email });
-    await sendEmail(email, firstName);
+    await sendRegistrationEmail(email, firstName);
 
     return { success: true, message: 'User registered successfully' };
   } catch (error) {
