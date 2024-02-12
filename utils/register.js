@@ -1,6 +1,5 @@
-// utils/register.js
 const { hashPassword } = require('./hash');
-const { getDatabase, ref, set, get } = require('firebase/database');
+const { getDatabase, ref, set, get, push } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
 
@@ -24,9 +23,13 @@ const registerUser = async (username, email, password, firstName, lastName, age)
   try {
     const hashedPassword = await hashPassword(password);
 
+    // Generate a new unique userId
+    const newUserRef = push(ref(db, 'users'));
+    const userId = newUserRef.key;
+
     // Save user details to the database
-    const userRef = ref(db, `users/${email.replace(/\./g, ',')}`);
     const userData = {
+      userId,
       username,
       email,
       password: hashedPassword,
@@ -35,12 +38,13 @@ const registerUser = async (username, email, password, firstName, lastName, age)
       age,
     };
 
-    await set(userRef, userData);
+    await set(newUserRef, userData);
     // Also, save the username to prevent duplicates
-    await set(usernameRef, { email });
+    await set(usernameRef, { userId });
+
     await sendRegistrationEmail(email, firstName);
 
-    return { success: true, message: 'User registered successfully' };
+    return { success: true, message: 'User registered successfully', userId };
   } catch (error) {
     console.log(`Error while trying to create a new user: ${error.message}`);
     console.error('Error registering user:', error);
