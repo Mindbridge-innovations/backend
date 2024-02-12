@@ -6,6 +6,7 @@ const {loginUser} = require('../utils/login')
 const generatePasswordResetToken = require('../utils/generatePasswordResetToken');
 const resetPassword = require('../utils/resetPassword');
 const authenticateToken = require('../middleware/authenticateToken');
+const updateUserProfile = require('../utils/updateUserProfile');
 
 router.post('/api/register', async (req, res) => {
     try {
@@ -53,11 +54,27 @@ router.post('/api/reset-password', async (req, res) => {
 })
 
 // Protected routes
-//router.post('/api/some-protected-route', authenticateToken, someProtectedRouteHandler);
+//Route to update user profile
+router.put('/api/user/profile', authenticateToken, async (req, res) => {
+  try {
+    // The userId should be extracted from the JWT token after authentication
+    const userId = req.user.userId;
+    const { firstName, lastName, age } = req.body;
 
-// Dummy protected route
-router.get('/api/dummy', authenticateToken, (req, res) => {
-  res.json({ message: 'You have accessed a protected dummy endpoint!', user: req.user });
+    // Construct the updates object
+    const updates = {};
+    if (firstName) updates.firstName = firstName;
+    if (lastName) updates.lastName = lastName;
+    if (age) updates.age = age;
+
+    // Update the user's profile
+    const result = await updateUserProfile(userId, updates);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
+
+
 
 module.exports = router;
