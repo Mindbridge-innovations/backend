@@ -21,38 +21,28 @@ const transporter = nodemailer.createTransport({
     }
 })
 
-const sendEmail = async(email, firstName)=>{
-    const emailContent = mailGenerator.generate({
-        body:{
-            name: firstName,
-            intro: "Welcome to MindBridge! We're very excited to have you on board.",
-            action:{
-                instructions: "To get started with MindBridge, please click here:",
-                button:{
-                    color: "#22BC66",
-                    text: "Confirm your account",
-                    // link: `${process.env.CLIENT_URL}/confirm/${email}`
-                }
-            },
-            outro: "Need help, or have questions? Just reply to this email, we'd love to help."
-        }
-    })
-
-    const mailOptions={
-        from: `"MindBridge" ${process.env.EMAIL_USER}`,
-        to: email,
-        subject: "MindBridge Account Confirmation!",
-        html: emailContent
-    }
-
+// Dynamic sendEmail function
+const sendEmail = async (email, subject, emailBody) => {
+    // Generate the email content using Mailgen
+    const emailContent = mailGenerator.generate(emailBody);
+  
+    // Setup email data
+    const mailOptions = {
+      from: `"MindBridge" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: subject,
+      html: emailContent
+    };
+  
+    // Send the email
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent: ' + info.response);
-        return "Email Sent";
-      } catch (error) {
-        console.log(error);
-        throw error; // Rethrow the error to be handled by the caller
-      }
-};
-
-module.exports = sendEmail;
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent: ' + info.response);
+      return "Email Sent";
+    } catch (error) {
+      console.log(error);
+      throw error; // Rethrow the error to be handled by the caller
+    }
+  };
+  
+  module.exports = sendEmail;
