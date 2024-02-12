@@ -34,7 +34,7 @@ const loginUser = async (email, password) => {
       }
   
       // Generate a JWT token
-      const token = jwt.sign({ email }, secretKey, { expiresIn: '1h' });
+      const token = jwt.sign({ email }, secretKey, { expiresIn: '7d' });
   
       return { token, userData };
     } catch (error) {
