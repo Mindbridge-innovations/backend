@@ -38,7 +38,7 @@ const generatePasswordResetToken = async (email) => {
       name: userData.firstName || email,
       intro: 'You have received this email because a password reset request for your account was received.',
       action: {
-        instructions: 'Click the button below to reset your password:',
+        instructions: 'Click the button below to reset your password. The password reset link is valid for 1 hour.',
         button: {
           color: '#DC4D2F',
           text: 'Reset Password',
