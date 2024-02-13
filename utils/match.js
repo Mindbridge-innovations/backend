@@ -1,1 +1,1 @@
-const { getDatabase, ref, get, query, orderByChild, equalTo } 
+const { getDatabase, ref, get, query, orderByChild, equalTo } = require('firebase/database');
