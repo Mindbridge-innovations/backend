@@ -11,7 +11,7 @@ const sendRegistrationEmail = async (email, firstName) => {
         button: {
           color: "#22BC66",
           text: "Confirm your account",
-          link: `${process.env.CLIENT_URL}/confirm/${email}` // Make sure this link is correct
+          link: `${process.env.CLIENT_URL}` // Make sure this link is correct
         }
       },
       outro: "Need help, or have questions? Just reply to this email, we'd love to help."
