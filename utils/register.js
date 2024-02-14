@@ -32,10 +32,11 @@ const registerUser = async (username, email, password, firstName, lastName, age)
       userId,
       username,
       email,
+      phoneNumber,
+      role,
       password: hashedPassword,
       firstName,
       lastName,
-      age,
     };
 
     await set(newUserRef, userData);
