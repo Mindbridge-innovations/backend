@@ -10,8 +10,8 @@ const updateUserProfile = require('../utils/updateUserProfile');
 
 router.post('/api/register', async (req, res) => {;
     try {
-      const { username, email,phoneNumber,role, password, firstName, lastName} = req.body;
-      const result = await registerUser(username, email, phoneNumber, role, password, firstName, lastName);
+      const { firstName, lastName,email,phoneNumber,username,password,role} = req.body;
+      const result = await registerUser(firstName, lastName,email,phoneNumber,username,password,role);
       res.status(201).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });
