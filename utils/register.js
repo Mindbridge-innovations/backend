@@ -3,7 +3,7 @@ const { getDatabase, ref, set, get, push } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
 
-const registerUser = async (username, email, password, firstName, lastName, age) => {
+const registerUser = async (username, email, password, firstName, lastName, role,phoneNumber) => {
   const db = getDatabase(firebaseApp);
 
   // Check if the email already exists
