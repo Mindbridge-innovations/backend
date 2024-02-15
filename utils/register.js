@@ -6,7 +6,6 @@ const sendRegistrationEmail = require('./sendRegistrationEmail');
 const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role) => {
   const db = getDatabase(firebaseApp);
 
-  // Check if the email already exists
   // Query the database for a user with the specified email
   const usersRef = ref(db, 'users');
   const emailQuery = query(usersRef, orderByChild('email'), equalTo(email));
