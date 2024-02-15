@@ -7,8 +7,12 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
   const db = getDatabase(firebaseApp);
 
   // Check if the email already exists
-  const emailRef = ref(db, `users/${email.replace(/\./g, ',')}`);
-  const emailSnapshot = await get(emailRef);
+  // Query the database for a user with the specified email
+  const usersRef = ref(db, 'users');
+  const emailQuery = query(usersRef, orderByChild('email'), equalTo(email));
+  const emailSnapshot = await get(emailQuery);
+
+  // Check if the email already exists
   if (emailSnapshot.exists()) {
     throw new Error('Email already in use');
   }
