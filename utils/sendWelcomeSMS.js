@@ -13,7 +13,7 @@ const vonage = new Vonage(credentials, options);
 
 const sendWelcomeSMS = async (phoneNumber, firstName) => {
   const from = "MindBridge";
-  const to = phoneNumber;
+  const to = `+256${phoneNumber}`; // Your phone number with country code
   const text = `Hello ${firstName}, welcome to MindBridge! Please check your email to confirm your account.`;
 
   try {
