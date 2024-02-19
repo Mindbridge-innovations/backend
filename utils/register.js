@@ -4,6 +4,8 @@ const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require(
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
 const sendWelcomeSMS = require('./sendWelcomeSms');
+const { fork } = require('child_process');
+
 
 const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role) => {
   const db = getDatabase(firebaseApp);
@@ -54,7 +56,7 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     await set(usernameRef, { userId });
 
     await sendRegistrationEmail(email, firstName, verificationToken);
-    await sendWelcomeSMS(phoneNumber, firstName);
+    const smsProcess = fork('./utils/sendWelcomeSmsProcess.js', [phoneNumber, firstName]);
 
     return { success: true, message: 'User registered successfully', userId };
   } catch (error) {
