@@ -40,6 +40,7 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
       password: hashedPassword,
       firstName,
       lastName,
+      isVerified:false,
     };
 
     await set(newUserRef, userData);
