@@ -1,26 +1,31 @@
 const { Vonage } = require('@vonage/server-sdk');
 
-const vonage = new Vonage({
+// Assuming you have set your credentials in environment variables
+const credentials = {
   apiKey: process.env.VONAGE_API_KEY,
   apiSecret: process.env.VONAGE_API_SECRET
-});
+};
 
-const sendWelcomeSMS = (phoneNumber, firstName) => {
-  const from = "YourBrand";
+// Options can be an empty object if you don't have any specific options
+const options = {};
+
+const vonage = new Vonage(credentials, options);
+
+const sendWelcomeSMS = async (phoneNumber, firstName) => {
+  const from = "MindBridge";
   const to = phoneNumber;
   const text = `Hello ${firstName}, welcome to MindBridge! Please check your email to confirm your account.`;
 
-  vonage.message.sendSms(from, to, text, (err, responseData) => {
-    if (err) {
-      console.error(err);
-    } else {
-      if(responseData.messages[0]['status'] === "0") {
-        console.log("Message sent successfully.");
-      } else {
-        console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-      }
-    }
-  });
+  try {
+    const resp = await vonage.sms.send({
+      from: from,
+      to: to,
+      text: text,
+    });
+    console.log("Message sent successfully:", resp);
+  } catch (err) {
+    console.error("Error sending SMS:", err);
+  }
 };
 
 module.exports = sendWelcomeSMS;

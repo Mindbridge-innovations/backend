@@ -6,6 +6,9 @@ const { firebaseApp } = require('./utils/firebaseConfig');
 const { initializeApp } = require("firebase/app");
 const router = require('./routes/router');
 
+// Disable SSL/TLS certificate verification (for development only)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const port = process.env.PORT || 3000;
 const app = express()
 

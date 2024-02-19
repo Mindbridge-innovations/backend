@@ -54,7 +54,7 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     await set(usernameRef, { userId });
 
     await sendRegistrationEmail(email, firstName, verificationToken);
-    sendWelcomeSMS(phoneNumber, firstName);
+    await sendWelcomeSMS(phoneNumber, firstName);
 
     return { success: true, message: 'User registered successfully', userId };
   } catch (error) {
