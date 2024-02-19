@@ -31,6 +31,9 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     const newUserRef = push(ref(db, 'users'));
     const userId = newUserRef.key;
 
+    //Generate a verification token for the new user
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
     // Save user details to the database
     const userData = {
       userId,
@@ -42,6 +45,7 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
       firstName,
       lastName,
       isVerified:false,
+      verificationToken,
     };
 
     await set(newUserRef, userData);
