@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
-const sendWelcomeSMS = require('./sendWelcomeSMS');
+const sendWelcomeSMS = require('./sendWelcomeSms');
 
 const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role) => {
   const db = getDatabase(firebaseApp);
@@ -54,6 +54,7 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     await set(usernameRef, { userId });
 
     await sendRegistrationEmail(email, firstName, verificationToken);
+    sendWelcomeSMS(phoneNumber, firstName);
 
     return { success: true, message: 'User registered successfully', userId };
   } catch (error) {
