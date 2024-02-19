@@ -52,7 +52,7 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     // Also, save the username to prevent duplicates
     await set(usernameRef, { userId });
 
-    await sendRegistrationEmail(email, firstName);
+    await sendRegistrationEmail(email, firstName, verificationToken);
 
     return { success: true, message: 'User registered successfully', userId };
   } catch (error) {

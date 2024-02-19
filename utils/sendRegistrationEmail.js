@@ -1,7 +1,7 @@
 // utils/sendRegistrationEmail.js
 const sendEmail = require('./mailer');
 
-const sendRegistrationEmail = async (email, firstName) => {
+const sendRegistrationEmail = async (email, firstName, verificationToken) => {
   const emailBody = {
     body: {
       name: firstName,
