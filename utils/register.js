@@ -1,4 +1,5 @@
 const { hashPassword } = require('./hash');
+const crypto = require('crypto');
 const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
@@ -30,6 +31,9 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     const newUserRef = push(ref(db, 'users'));
     const userId = newUserRef.key;
 
+    //Generate a verification token for the new user
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
     // Save user details to the database
     const userData = {
       userId,
@@ -41,6 +45,7 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
       firstName,
       lastName,
       isVerified:false,
+      verificationToken,
     };
 
     await set(newUserRef, userData);
