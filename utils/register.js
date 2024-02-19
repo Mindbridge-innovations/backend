@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
+const sendWelcomeSMS = require('./sendWelcomeSMS');
 
 const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role) => {
   const db = getDatabase(firebaseApp);
