@@ -1,4 +1,5 @@
 const { hashPassword } = require('./hash');
+const crypto = require('crypto');
 const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
