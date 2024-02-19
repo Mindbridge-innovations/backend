@@ -7,6 +7,7 @@ const generatePasswordResetToken = require('../utils/generatePasswordResetToken'
 const resetPassword = require('../utils/resetPassword');
 const authenticateToken = require('../middleware/authenticateToken');
 const updateUserProfile = require('../utils/updateUserProfile');
+const verifyUser = require('../utils/verifyUser')
 
 router.post('/api/register', async (req, res) => {;
     try {
@@ -54,7 +55,26 @@ router.post('/api/reset-password', async (req, res) => {
 })
 
 //verify new user
+router.get('/api/verify', async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) {
+      return res.status(400).json({ message: 'Verification token is required' });
+    }
 
+    const result = await verifyUser(token);
+
+    if (result.verified) {
+      // Redirect to a confirmation page or login page
+      res.redirect(`${process.env.CLIENT_URL}/verified`);
+    } else {
+      res.status(404).json({ message: 'User not found or already verified' });
+    }
+  } catch (error) {
+    console.error('Error verifying user:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Protected routes
 //Route to update user profile
