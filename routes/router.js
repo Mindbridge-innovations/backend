@@ -53,6 +53,9 @@ router.post('/api/reset-password', async (req, res) => {
   }
 })
 
+//verify new user
+
+
 // Protected routes
 //Route to update user profile
 router.put('/api/user/profile', authenticateToken, async (req, res) => {
