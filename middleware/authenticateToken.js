@@ -11,6 +11,7 @@ const authenticateToken = (req, res, next) => {
     if (err) return res.sendStatus(403); // If token is not valid, return a forbidden error
     req.user = decoded; // Set the decoded token payload in the request object
     next(); // Proceed to the next middleware or route handler
+    //redeploy
   });
 };
 
