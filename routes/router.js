@@ -66,7 +66,7 @@ router.get('/api/verify', async (req, res) => {
 
     if (result.verified) {
       // Redirect to a confirmation page or login page
-      res.redirect(`${process.env.CLIENT_URL}/verified`);
+      res.redirect(`${process.env.APP_URL}`);
     } else {
       res.status(404).json({ message: 'User not found or already verified' });
     }
