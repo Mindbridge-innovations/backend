@@ -7,7 +7,8 @@ const generatePasswordResetToken = require('../utils/generatePasswordResetToken'
 const resetPassword = require('../utils/resetPassword');
 const authenticateToken = require('../middleware/authenticateToken');
 const updateUserProfile = require('../utils/updateUserProfile');
-const verifyUser = require('../utils/verifyUser')
+const verifyUser = require('../utils/verifyUser');
+const { getUserDetails } = require('../utils/getUser');
 
 router.post('/api/register', async (req, res) => {;
     try {
@@ -93,6 +94,18 @@ router.put('/api/user/profile', authenticateToken, async (req, res) => {
     // Update the user's profile
     const result = await updateUserProfile(userId, updates);
     res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get user details endpoint
+router.get('/api/user', authenticateToken, async (req, res) => {
+  try {
+    // The userId is extracted from the JWT token after authentication
+    const userId = req.user.userId;
+    const userDetails = await getUserDetails(userId);
+    res.status(200).json(userDetails);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
