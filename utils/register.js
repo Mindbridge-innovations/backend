@@ -1,3 +1,4 @@
+//utils/register.js
 const { hashPassword } = require('./hash');
 const crypto = require('crypto');
 const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require('firebase/database');
