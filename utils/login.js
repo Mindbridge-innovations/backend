@@ -25,6 +25,10 @@ const loginUser = async (email, password) => {
       const userKey = Object.keys(usersData).find(key => usersData[key].email === email);
       const userData = usersData[userKey];
 
+      //check if the user is verified
+      if (!userData.isVerified) {
+        throw new Error('User is  not verified yet! Please check your inbox for verification mail.');
+      }
       // Compare the provided password with the hashed password stored in the database
       const passwordMatch = await bcrypt.compare(password, userData.password);
       if (!passwordMatch) {
