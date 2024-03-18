@@ -1,13 +1,14 @@
+//utils/register.js
 const { hashPassword } = require('./hash');
-const { getDatabase, ref, set, get, push,query,orderByChild,equalTo } = require('firebase/database');
+const crypto = require('crypto');
+const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
 
-const registerUser = async (username, email, password, firstName, lastName, age) => {
+const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role) => {
   const db = getDatabase(firebaseApp);
 
-  // Check if the email already exists
-  //Query the database for a user with the specified email
+  // Query the database for a user with the specified email
   const usersRef = ref(db, 'users');
   const emailQuery = query(usersRef, orderByChild('email'), equalTo(email));
   const emailSnapshot = await get(emailQuery);
@@ -16,7 +17,6 @@ const registerUser = async (username, email, password, firstName, lastName, age)
   if (emailSnapshot.exists()) {
     throw new Error('Email already in use');
   }
-
 
   // Check if the username already exists
   const usernameRef = ref(db, `usernames/${username}`);
@@ -32,6 +32,9 @@ const registerUser = async (username, email, password, firstName, lastName, age)
     const newUserRef = push(ref(db, 'users'));
     const userId = newUserRef.key;
 
+    //Generate a verification token for the new user
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
     // Save user details to the database
     const userData = {
       userId,
@@ -42,13 +45,15 @@ const registerUser = async (username, email, password, firstName, lastName, age)
       password: hashedPassword,
       firstName,
       lastName,
+      isVerified:false,
+      verificationToken,
     };
 
     await set(newUserRef, userData);
     // Also, save the username to prevent duplicates
     await set(usernameRef, { userId });
 
-    await sendRegistrationEmail(email, firstName);
+    await sendRegistrationEmail(email, firstName, verificationToken);
 
     return { success: true, message: 'User registered successfully', userId };
   } catch (error) {
