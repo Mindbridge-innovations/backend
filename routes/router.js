@@ -13,8 +13,8 @@ const {createAppointment} = require('../utils/appointment')
 
 router.post('/api/register', async (req, res) => {;
     try {
-      const { firstName, lastName,email,phoneNumber,username,password,role} = req.body;
-      const result = await registerUser(firstName, lastName,email,phoneNumber,username,password,role);
+      const { firstName, lastName,email,phoneNumber,username,password,role,responses} = req.body;
+      const result = await registerUser(firstName, lastName,email,phoneNumber,username,password,role,responses);
       res.status(201).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });
