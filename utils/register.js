@@ -5,7 +5,7 @@ const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require(
 const { firebaseApp } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
 
-const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role) => {
+const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role,responses) => {
   const db = getDatabase(firebaseApp);
 
   // Query the database for a user with the specified email
@@ -52,6 +52,13 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     await set(newUserRef, userData);
     // Also, save the username to prevent duplicates
     await set(usernameRef, { userId });
+
+    // Save responses to a separate document (table) referenced by userId
+    if (responses) {
+      const responsesRef = ref(db, `responses/${userId}`);
+      await set(responsesRef, responses);
+    }
+
 
     await sendRegistrationEmail(email, firstName, verificationToken);
 
