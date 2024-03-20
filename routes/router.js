@@ -9,6 +9,7 @@ const authenticateToken = require('../middleware/authenticateToken');
 const updateUserProfile = require('../utils/updateUserProfile');
 const verifyUser = require('../utils/verifyUser');
 const { getUserDetails } = require('../utils/getUser');
+const {createAppointment} = require('../utils/appointment')
 
 router.post('/api/register', async (req, res) => {;
     try {
@@ -106,6 +107,22 @@ router.get('/api/user', authenticateToken, async (req, res) => {
     const userId = req.user.userId;
     const userDetails = await getUserDetails(userId);
     res.status(200).json(userDetails);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to create a new appointment
+router.post('/api/appointments', authenticateToken, async (req, res) => {
+  try {
+    // The userId is extracted from the JWT token after authentication
+    const userId = req.user.userId;
+    const appointmentData = req.body;
+
+    // Validate appointmentData here (e.g., check for required fields)
+
+    const result = await createAppointment(userId, appointmentData);
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
