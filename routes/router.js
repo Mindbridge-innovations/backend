@@ -9,6 +9,7 @@ const authenticateToken = require('../middleware/authenticateToken');
 const updateUserProfile = require('../utils/updateUserProfile');
 const verifyUser = require('../utils/verifyUser');
 const { getUserDetails } = require('../utils/getUser');
+const {createAppointmnet} = require('../utils/appointment')
 
 router.post('/api/register', async (req, res) => {;
     try {
