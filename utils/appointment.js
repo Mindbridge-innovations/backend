@@ -1,5 +1,5 @@
 // utils/appointment.js
-const { getDatabase, ref, push } = require('firebase/database');
+const { getDatabase, ref, set,push } = require('firebase/database');
 const { firebaseApp } = require('./firebaseConfig');
 
 const createAppointment = async (userId, appointmentData) => {
