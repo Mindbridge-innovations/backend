@@ -10,6 +10,7 @@ const updateUserProfile = require('../utils/updateUserProfile');
 const verifyUser = require('../utils/verifyUser');
 const { getUserDetails } = require('../utils/getUser');
 const {createAppointment} = require('../utils/appointment')
+const { matchClientsWithTherapists } = require('../utils/match');
 
 router.post('/api/register', async (req, res) => {;
     try {
@@ -124,6 +125,17 @@ router.post('/api/appointments', authenticateToken, async (req, res) => {
     const result = await createAppointment(userId, appointmentData);
     res.status(201).json(result);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to trigger the matching process
+router.post('/api/match', async (req, res) => {
+  try {
+    const matches = await matchClientsWithTherapists();
+    res.status(200).json({ success: true, matches });
+  } catch (error) {
+    console.error('Error during matching process:', error);
     res.status(500).json({ message: error.message });
   }
 });
