@@ -1,6 +1,5 @@
 // routes/router.js
 const express = require('express');
-const admin=require('firebase-admin')
 const router = express.Router();
 const {registerUser} = require('../utils/register')
 const {loginUser} = require('../utils/login')

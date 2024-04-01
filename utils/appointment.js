@@ -17,6 +17,7 @@ const createAppointment = async (userId, appointmentData) => {
     reason: appointmentData.reason,
     description: appointmentData.description,
     appointmentType: appointmentData.appointmentType,
+    therapistId:appointmentData.therapistId,
     status: appointmentData.status,
   };
 
