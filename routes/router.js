@@ -11,6 +11,7 @@ const updateUserProfile = require('../utils/updateUserProfile');
 const verifyUser = require('../utils/verifyUser');
 const { getUserDetails } = require('../utils/getUser');
 const {createAppointment} = require('../utils/appointment')
+const { matchClientsWithTherapists } = require('../utils/match');
 
 
 router.post('/api/register', async (req, res) => {;
@@ -130,34 +131,15 @@ router.post('/api/appointments', authenticateToken, async (req, res) => {
   }
 });
 
-const admin = require('firebase-admin');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccountKey),
-});
-
-router.post('/initiateCall', (req, res) => {
-  const { callerId, calleeId,callId } = req.body;
-  const calleeFCMToken = getCalleeFCMToken(calleeId);
-
-  const message = {
-    notification: {
-      title: 'Incoming Video Call',
-      body: 'You have an incoming video call.',
-    },
-    data: {
-      callId: callId,
-      callerId: callerId,
-    },
-    token: calleeFCMToken,
-  };
-
-  admin.messaging().send(message)
-    .then((response) => {
-      res.status(200).send('Call notification sent successfully');
-    })
-    .catch((error) => {
-      res.status(500).send('Error sending call notification');
-    });
+// Route to trigger the matching process
+router.post('/api/match', async (req, res) => {
+  try {
+    const matches = await matchClientsWithTherapists();
+    res.status(200).json({ success: true, matches });
+  } catch (error) {
+    console.error('Error during matching process:', error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 
