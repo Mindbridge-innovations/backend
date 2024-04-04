@@ -11,6 +11,7 @@ const verifyUser = require('../utils/verifyUser');
 const { getUserDetails } = require('../utils/getUser');
 const {createAppointment} = require('../utils/appointment')
 const { matchClientsWithTherapists } = require('../utils/match');
+const {createRating}=require('../utils/rating');
 
 
 router.post('/api/register', async (req, res) => {;
@@ -141,6 +142,20 @@ router.post('/api/match', async (req, res) => {
   }
 });
 
+router.post('/api/ratings', authenticateToken, async (req, res) => {
+  try {
+    // The userId is extracted from the JWT token after authentication
+    const userId = req.user.userId;
+    const ratingData = req.body;
+
+    // Validate ratingData here (e.g., check for required fields)
+
+    const result = await createRating(userId, ratingData);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 
 module.exports = router;
