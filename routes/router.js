@@ -1,6 +1,11 @@
 // routes/router.js
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const { createFeedback } = require('../utils/feedback');
+
+// Set up multer for file handling
+const upload = multer({ storage: multer.memoryStorage() });
 const {registerUser} = require('../utils/register')
 const {loginUser} = require('../utils/login')
 const generatePasswordResetToken = require('../utils/generatePasswordResetToken');
@@ -12,6 +17,7 @@ const { getUserDetails } = require('../utils/getUser');
 const {createAppointment} = require('../utils/appointment')
 const { matchClientsWithTherapists } = require('../utils/match');
 const {createRating}=require('../utils/rating');
+
 
 
 router.post('/api/register', async (req, res) => {;
@@ -156,6 +162,34 @@ router.post('/api/ratings', authenticateToken, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+// Endpoint for submitting feedback
+router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (req, res) => {
+  try {
+    // The userId is extracted from the JWT token after authentication
+    const userId = req.user.userId;
+    const { feedback, clientId } = req.body;
+    let fileData = null;
+
+    // If a file is uploaded, prepare the file data
+    if (req.file) {
+      fileData = {
+        fileBuffer: req.file.buffer,
+        fileName: req.file.originalname,
+        mimeType: req.file.mimetype,
+      };
+    }
+
+    // Save the feedback and file to the database and storage
+    const result = await createFeedback(userId, { feedback, clientId }, fileData);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ... rest of the module.exports
 
 
 module.exports = router;

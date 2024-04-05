@@ -10,6 +10,8 @@ admin.initializeApp({
     privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Replace the escaped newline characters in the private key
   }),
   databaseURL: process.env.FIREBASE_DATABASE_URL,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET, // Make sure this is set
+
 });
 
 // As an admin, the app has access to read and write all data, regardless of Security Rules
