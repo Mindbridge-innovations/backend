@@ -7,23 +7,34 @@ const { admin, db } = require('./firebaseConfig');
 const calculateMatchScore = (clientResponses, therapistResponses) => {
   let score = 0;
 
+  // Check if both client and therapist responses are valid
+  if (!clientResponses || !therapistResponses) {
+    return score;
+  }
+
   // Score for language compatibility
-  const sharedLanguages = clientResponses.languages.filter(language =>
-    therapistResponses.languages.includes(language)
-  );
-  score += sharedLanguages.length * 10; // Assign 10 points for each shared language
+  if (clientResponses.languages && therapistResponses.languages) {
+    const sharedLanguages = clientResponses.languages.filter(language =>
+      therapistResponses.languages.includes(language)
+    );
+    score += sharedLanguages.length * 10; // Assign 10 points for each shared language
+  }
 
   // Score for communication preferences
-  const sharedCommunicationMethods = clientResponses.communication.filter(method =>
-    therapistResponses.communication.includes(method)
-  );
-  score += sharedCommunicationMethods.length * 5; // Assign 5 points for each shared communication method
+  if (clientResponses.communication && therapistResponses.communication) {
+    const sharedCommunicationMethods = clientResponses.communication.filter(method =>
+      therapistResponses.communication.includes(method)
+    );
+    score += sharedCommunicationMethods.length * 5; // Assign 5 points for each shared communication method
+  }
 
   // Score for therapy experiences
-  const matchingTherapyExperiences = clientResponses.therapy_experiences.filter(experience =>
-    therapistResponses.therapy_experiences.includes(experience)
-  );
-  score += matchingTherapyExperiences.length * 15; // Assign 15 points for each matching therapy experience
+  if (clientResponses.therapy_experiences && therapistResponses.therapy_experiences) {
+    const matchingTherapyExperiences = clientResponses.therapy_experiences.filter(experience =>
+      therapistResponses.therapy_experiences.includes(experience)
+    );
+    score += matchingTherapyExperiences.length * 15; // Assign 15 points for each matching therapy experience
+  }
 
   return score;
 };
