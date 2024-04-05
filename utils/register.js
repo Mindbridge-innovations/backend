@@ -1,17 +1,14 @@
 //utils/register.js
 const { hashPassword } = require('./hash');
 const crypto = require('crypto');
-const { getDatabase, ref, set, get, push,equalTo,orderByChild,query } = require('firebase/database');
-const { firebaseApp } = require('./firebaseConfig');
+const { admin, db } = require('./firebaseConfig');
 const sendRegistrationEmail = require('./sendRegistrationEmail');
 
-const registerUser = async (firstName, lastName,email,phoneNumber,username,password,role,responses) => {
-  const db = getDatabase(firebaseApp);
-
+const registerUser = async (firstName, lastName, email, phoneNumber, username, password, role, responses) => {
   // Query the database for a user with the specified email
-  const usersRef = ref(db, 'users');
-  const emailQuery = query(usersRef, orderByChild('email'), equalTo(email));
-  const emailSnapshot = await get(emailQuery);
+  const usersRef = db.ref('users');
+  const emailQuery = usersRef.orderByChild('email').equalTo(email);
+  const emailSnapshot = await emailQuery.once('value');
 
   // Check if the email already exists
   if (emailSnapshot.exists()) {
@@ -19,8 +16,8 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
   }
 
   // Check if the username already exists
-  const usernameRef = ref(db, `usernames/${username}`);
-  const usernameSnapshot = await get(usernameRef);
+  const usernameRef = db.ref(`usernames/${username}`);
+  const usernameSnapshot = await usernameRef.once('value');
   if (usernameSnapshot.exists()) {
     throw new Error('Username already taken');
   }
@@ -29,10 +26,10 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
     const hashedPassword = await hashPassword(password);
 
     // Generate a new unique userId
-    const newUserRef = push(ref(db, 'users'));
+    const newUserRef = usersRef.push();
     const userId = newUserRef.key;
 
-    //Generate a verification token for the new user
+    // Generate a verification token for the new user
     const verificationToken = crypto.randomBytes(20).toString('hex');
 
     // Save user details to the database
@@ -45,20 +42,19 @@ const registerUser = async (firstName, lastName,email,phoneNumber,username,passw
       password: hashedPassword,
       firstName,
       lastName,
-      isVerified:false,
+      isVerified: false,
       verificationToken,
     };
 
-    await set(newUserRef, userData);
+    await newUserRef.set(userData);
     // Also, save the username to prevent duplicates
-    await set(usernameRef, { userId });
+    await usernameRef.set({ userId });
 
     // Save responses to a separate document (table) referenced by userId
     if (responses) {
-      const responsesRef = ref(db, `responses/${userId}`);
-      await set(responsesRef, responses);
+      const responsesRef = db.ref(`responses/${userId}`);
+      await responsesRef.set(responses);
     }
-
 
     await sendRegistrationEmail(email, firstName, verificationToken);
 
