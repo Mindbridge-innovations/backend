@@ -1,6 +1,6 @@
 //utils/firebaseConfig.js
-require('dotenv').config();
 const admin = require('firebase-admin');
+require('dotenv').config();
 
 // Initialize the app with a service account, granting admin privileges
 admin.initializeApp({

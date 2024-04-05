@@ -2,8 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { firebaseApp } = require('./utils/firebaseConfig'); 
-const { initializeApp } = require("firebase/app");
 const router = require('./routes/router');
 
 const port = process.env.PORT || 3000;
