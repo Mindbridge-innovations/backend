@@ -40,7 +40,7 @@ const calculateMatchScore = (clientResponses, therapistResponses) => {
 };
 
 // Function to match clients with therapists
-const matchClientsWithTherapists = async () => {
+const matchClientsWithTherapists = async (requestingClientId) => {
   const usersRef = db.ref('users');
   const responsesRef = db.ref('responses');
   const matchesRef = db.ref('matches');
@@ -56,11 +56,17 @@ const matchClientsWithTherapists = async () => {
   const therapists = therapistsSnapshot.val();
   const clients = clientsSnapshot.val();
 
+  // Filter out clients who are already matched or do not want to be matched
+  const unmatchedClients = Object.keys(clients).filter((clientId) => {
+    const client = clients[clientId];
+    return !client.isMatched && (!requestingClientId || clientId === requestingClientId);
+  });
+
   // Create an array to store potential matches
   let potentialMatches = [];
 
-  // Calculate scores for each client-therapist pair
-  for (const clientId in clients) {
+  // Calculate scores for each unmatched client-therapist pair
+  for (const clientId of unmatchedClients) {
     const clientResponsesSnapshot = await responsesRef.child(clientId).once('value');
     const clientResponses = clientResponsesSnapshot.val();
 
@@ -76,15 +82,27 @@ const matchClientsWithTherapists = async () => {
   // Sort potential matches by score
   potentialMatches.sort((a, b) => b.score - a.score);
 
-  // Distribute clients to therapists, ensuring no therapist has more than 5 clients
-  // and that clients are evenly distributed
+  // Distribute clients to therapists, ensuring each client is only matched once
   const matches = {};
+  const matchedClients = new Set(); // Keep track of clients that have been matched
+
   potentialMatches.forEach(match => {
+    if (matchedClients.has(match.clientId)) {
+      // Skip this match as the client is already matched
+      return;
+    }
+
     if (!matches[match.therapistId]) {
       matches[match.therapistId] = [];
     }
+
+    // Ensure the therapist does not have more than 5 clients
     if (matches[match.therapistId].length < 5) {
       matches[match.therapistId].push(match.clientId);
+      matchedClients.add(match.clientId); // Mark this client as matched
+
+      // Set the client's isMatched field to true
+      usersRef.child(match.clientId).update({ isMatched: true });
     }
   });
 
@@ -96,5 +114,7 @@ const matchClientsWithTherapists = async () => {
 
   return matches;
 };
+
+
 
 module.exports = { matchClientsWithTherapists };
