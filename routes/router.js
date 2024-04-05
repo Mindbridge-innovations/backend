@@ -138,9 +138,10 @@ router.post('/api/appointments', authenticateToken, async (req, res) => {
 });
 
 // Route to trigger the matching process
-router.post('/api/match', async (req, res) => {
+router.post('/api/match', authenticateToken,async (req, res) => {
+  const userId = req.user.userId;
   try {
-    const matches = await matchClientsWithTherapists();
+    const matches = await matchClientsWithTherapists(userId);
     res.status(200).json({ success: true, matches });
   } catch (error) {
     console.error('Error during matching process:', error);
