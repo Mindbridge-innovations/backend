@@ -1,26 +1,24 @@
-// utils/ratingd.js
-const { getDatabase, ref, set,push } = require('firebase/database');
-const { firebaseApp } = require('./firebaseConfig');
+// utils/rating.js
+const { admin, db } = require('./firebaseConfig');
 
 const createRating = async (userId, ratingData) => {
-  const db = getDatabase(firebaseApp);
-  const ratingsRef = ref(db, 'ratings');
+  const ratingsRef = db.ref('ratings');
 
   // Create a new rating reference with a unique key
-  const newRatingRef = push(ratingsRef);
+  const newRatingRef = ratingsRef.push();
 
   // Construct the rating object
   const newRating = {
     rating: ratingData.rating,
     review: ratingData.review,
-    clientId:userId,
+    clientId: userId,
     therapistId: ratingData.therapistId,
   };
 
   // Save the rating to the database
-  await set(newRatingRef, newRating);
+  await newRatingRef.set(newRating);
 
-  return { success: true, message: 'You have rated therapist successfully', ratingId: newRatingRef.key };
+  return { success: true, message: 'You have rated the therapist successfully', ratingId: newRatingRef.key };
 };
 
 module.exports = { createRating };

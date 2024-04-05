@@ -1,15 +1,12 @@
 // utils/resetPassword.js
-const { getDatabase, ref, set, get, query, orderByChild, equalTo } = require('firebase/database');
-const { firebaseApp } = require('./firebaseConfig');
+const { admin, db } = require('./firebaseConfig');
 const { hashPassword } = require('./hash');
 
 const resetPassword = async (email, token, newPassword) => {
-  const db = getDatabase(firebaseApp);
-
   // Query the database for a user with the specified email
-  const usersRef = ref(db, 'users');
-  const usersQuery = query(usersRef, orderByChild('email'), equalTo(email));
-  const userSnapshot = await get(usersQuery);
+  const usersRef = db.ref('users');
+  const usersQuery = usersRef.orderByChild('email').equalTo(email);
+  const userSnapshot = await usersQuery.once('value');
 
   if (!userSnapshot.exists()) {
     throw new Error('User not found');
@@ -21,8 +18,8 @@ const resetPassword = async (email, token, newPassword) => {
   const userData = usersData[userId];
 
   // Reference to the password reset token in the database
-  const tokenRef = ref(db, `passwordResetTokens/${userId}`);
-  const tokenSnapshot = await get(tokenRef);
+  const tokenRef = db.ref(`passwordResetTokens/${userId}`);
+  const tokenSnapshot = await tokenRef.once('value');
   const tokenData = tokenSnapshot.val();
 
   if (!tokenData || tokenData.token !== token || tokenData.expires < Date.now()) {
@@ -33,10 +30,11 @@ const resetPassword = async (email, token, newPassword) => {
   const hashedPassword = await hashPassword(newPassword);
 
   // Update the user's password in the database
-  await set(ref(db, `users/${userId}`), { ...userData, password: hashedPassword });
+  const userPasswordRef = db.ref(`users/${userId}/password`);
+  await userPasswordRef.set(hashedPassword);
 
   // Delete the password reset token from the database
-  await set(tokenRef, null);
+  await tokenRef.remove();
 
   return { success: true, message: 'Password reset successfully' };
 };

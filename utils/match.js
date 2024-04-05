@@ -1,6 +1,5 @@
 // utils/match.js
-const { getDatabase, ref, get, query, orderByChild, equalTo,child } = require('firebase/database');
-const { firebaseApp } = require('./firebaseConfig');
+const { admin, db } = require('./firebaseConfig');
 
 
 
@@ -31,14 +30,13 @@ const calculateMatchScore = (clientResponses, therapistResponses) => {
 
 // Function to match clients with therapists
 const matchClientsWithTherapists = async () => {
-  const db = getDatabase(firebaseApp);
-  const usersRef = ref(db, 'users');
-  const responsesRef = ref(db, 'responses');
-  const matchesRef = ref(db, 'matches');
+  const usersRef = db.ref('users');
+  const responsesRef = db.ref('responses');
+  const matchesRef = db.ref('matches');
 
   // Retrieve all therapists and clients
-  const therapistsSnapshot = await get(query(usersRef, orderByChild('role'), equalTo('therapist')));
-  const clientsSnapshot = await get(query(usersRef, orderByChild('role'), equalTo('client')));
+  const therapistsSnapshot = await usersRef.orderByChild('role').equalTo('therapist').once('value');
+  const clientsSnapshot = await usersRef.orderByChild('role').equalTo('client').once('value');
 
   if (!therapistsSnapshot.exists() || !clientsSnapshot.exists()) {
     throw new Error('No therapists or clients found');
@@ -52,11 +50,11 @@ const matchClientsWithTherapists = async () => {
 
   // Calculate scores for each client-therapist pair
   for (const clientId in clients) {
-    const clientResponsesSnapshot = await get(ref(responsesRef, clientId));
+    const clientResponsesSnapshot = await responsesRef.child(clientId).once('value');
     const clientResponses = clientResponsesSnapshot.val();
 
     for (const therapistId in therapists) {
-      const therapistResponsesSnapshot = await get(ref(responsesRef, therapistId));
+      const therapistResponsesSnapshot = await responsesRef.child(therapistId).once('value');
       const therapistResponses = therapistResponsesSnapshot.val();
 
       const score = calculateMatchScore(clientResponses, therapistResponses);
@@ -81,8 +79,8 @@ const matchClientsWithTherapists = async () => {
 
   // Save the matches to the database
   for (const therapistId in matches) {
-    const therapistMatchesRef = push(ref(matchesRef, therapistId));
-    await set(therapistMatchesRef, matches[therapistId]);
+    const therapistMatchesRef = matchesRef.child(therapistId);
+    await therapistMatchesRef.set(matches[therapistId]);
   }
 
   return matches;
