@@ -170,7 +170,7 @@ router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (r
   try {
     // The userId is extracted from the JWT token after authentication
     const userId = req.user.userId;
-    const { feedback, clientId } = req.body;
+    const { textFeedback, clientId } = req.body;
     let fileData = null;
 
     // If a file is uploaded, prepare the file data
@@ -183,7 +183,7 @@ router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (r
     }
 
     // Save the feedback and file to the database and storage
-    const result = await createFeedback(userId, { textFeedback:feedback, clientId }, fileData);
+    const result = await createFeedback(userId, textFeedback, clientId, fileData);
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
