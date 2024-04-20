@@ -2,7 +2,7 @@
 const { db } = require('./firebaseConfig');
 const { getStorage } = require('firebase-admin/storage');
 
-const createFeedback = async (userId,textFeedback,clientId, fileData) => {
+const createFeedback = async (userId, feedbackData, fileData) => {
   const storage = getStorage();
   const feedbacksRef = db.ref('feedbacks');
   const newFeedbackRef = feedbacksRef.push();
@@ -25,9 +25,9 @@ const createFeedback = async (userId,textFeedback,clientId, fileData) => {
   // Construct the feedback object
   const newFeedback = {
     therapistId: userId,
-    textFeedback:textFeedback,
+    textFeedback: feedbackData.feedback,
     fileUrl: fileUrl, // This will be null if no file was uploaded
-    clientId:clientId,
+    clientId: feedbackData.clientId,
   };
 
   // Save the feedback to the database
