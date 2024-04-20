@@ -183,7 +183,7 @@ router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (r
     }
 
     // Save the feedback and file to the database and storage
-    const result = await createFeedback(userId, { feedback, clientId }, fileData);
+    const result = await createFeedback(userId, { textFeedback:feedback, clientId }, fileData);
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
