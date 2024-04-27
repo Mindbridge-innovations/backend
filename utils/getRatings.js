@@ -9,8 +9,7 @@ const getRatingsAndClientDetails = async (therapistId) => {
   
     const clientDetailsPromises = Object.keys(ratings).map(async (key) => {
       const clientId = ratings[key].clientId;
-    //   console.log("Fetching details for clientId:", clientId);
-      const clientSnapshot = await usersRef.orderByChild('userId').equalTo(clientId).once('value');
+      const clientSnapshot = await usersRef.child(clientId).once('value');
       const clientDetails = clientSnapshot.val();
   
       return {
