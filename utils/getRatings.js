@@ -19,7 +19,7 @@ const getRatingsAndClientDetails = async (therapistId) => {
     });
   
     const ratingsAndClients = await Promise.all(clientDetailsPromises);
-    return ratingsAndClients;
+    return ratingsAndClients.reverse;
   };
 
   module.exports={getRatingsAndClientDetails};

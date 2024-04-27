@@ -18,6 +18,8 @@ const {createAppointment} = require('../utils/appointment')
 const { matchClientsWithTherapists } = require('../utils/match');
 const {createRating}=require('../utils/rating');
 const {getRatingsAndClientDetails}=require('../utils/getRatings');
+const { getFeedbacksAndTherapists } = require('../utils/getFeedbacks'); // Adjust the path as necessary
+
 
 
 
@@ -205,5 +207,15 @@ router.get('/api/therapist/ratings', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/api/client/feedbacks', authenticateToken,async (req, res) => {
+  try {
+      const userId = req.user.userId; // Assuming you have middleware to authenticate and add user info
+      const feedbacksAndTherapists = await getFeedbacksAndTherapists(userId);
+      res.status(200).json(feedbacksAndTherapists);
+  } catch (error) {
+      console.error('Error fetching feedbacks and therapists:', error);
+      res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;
