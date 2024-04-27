@@ -19,6 +19,7 @@ const { matchClientsWithTherapists } = require('../utils/match');
 const {createRating}=require('../utils/rating');
 const {getRatingsAndClientDetails}=require('../utils/getRatings');
 const { getFeedbacksAndTherapists } = require('../utils/getFeedbacks'); // Adjust the path as necessary
+const {getMatchedTherapistsForUser}=require('../utils/fetchMatchedTherapists');
 
 
 
@@ -214,6 +215,20 @@ router.get('/api/client/feedbacks', authenticateToken,async (req, res) => {
       res.status(200).json(feedbacksAndTherapists);
   } catch (error) {
       console.error('Error fetching feedbacks and therapists:', error);
+      res.status(500).json({ message: error.message });
+  }
+});
+
+// routes/router.js
+
+// Endpoint to get matched therapists for a user
+router.get('/api/matched-therapists', authenticateToken, async (req, res) => {
+  try {
+      const userId = req.user.userId; // Extracted from JWT token
+      const matchedTherapists = await getMatchedTherapistsForUser(userId);
+      res.status(200).json(matchedTherapists);
+  } catch (error) {
+      console.error('Error fetching matched therapists:', error);
       res.status(500).json({ message: error.message });
   }
 });
