@@ -24,10 +24,11 @@ const createFeedback = async (userId, feedback, clientId, fileData) => {
 
   // Construct the feedback object
   const newFeedback = {
+    clientId:clientId,
     therapistId: userId,
     feedback:feedback,
     fileUrl: fileUrl, // This will be null if no file was uploaded
-    clientId:clientId,
+    
   };
   
 

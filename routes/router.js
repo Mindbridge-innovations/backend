@@ -17,6 +17,8 @@ const { getUserDetails } = require('../utils/getUser');
 const {createAppointment} = require('../utils/appointment')
 const { matchClientsWithTherapists } = require('../utils/match');
 const {createRating}=require('../utils/rating');
+const {getRatingsAndClientDetails}=require('../utils/getRatings');
+
 
 
 
@@ -190,7 +192,18 @@ router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (r
   }
 });
 
-// ... rest of the module.exports
+
+// Endpoint to get ratings and client details for a therapist
+router.get('/api/therapist/ratings', authenticateToken, async (req, res) => {
+  try {
+    const therapistId = req.user.userId; // Assuming the therapist's userId is in the JWT token
+    const ratingsAndClients = await getRatingsAndClientDetails(therapistId);
+    res.status(200).json(ratingsAndClients);
+  } catch (error) {
+    console.error('Error fetching ratings and client details:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 
 module.exports = router;
