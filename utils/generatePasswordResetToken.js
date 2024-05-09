@@ -40,7 +40,7 @@ const generatePasswordResetToken = async (email) => {
         button: {
           color: '#DC4D2F',
           text: 'Reset Password',
-          link: `${process.env.CLIENT_URL}/v1/api/reset-password/${token}`, // Update with the correct link
+          link: `${process.env.CLIENT_URL}/v1/api/reset-password/token=${token}`, // Update with the correct link
         },
       },
       outro: 'If you did not request a password reset, no further action is required on your part.',
