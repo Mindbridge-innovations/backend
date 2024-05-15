@@ -94,20 +94,21 @@ router.get('/api/verify', async (req, res) => {
 
 // Protected routes
 //Route to update user profile
-router.put('/api/user/profile', authenticateToken, async (req, res) => {
+router.put('/api/user/profile', authenticateToken, upload.single('profileImage'), async (req, res) => {
   try {
-    // The userId should be extracted from the JWT token after authentication
     const userId = req.user.userId;
-    const { firstName, lastName, age } = req.body;
+    const { firstName, lastName, username,phoneNumber } = req.body;
+    const imageFile = req.file;
 
     // Construct the updates object
     const updates = {};
     if (firstName) updates.firstName = firstName;
     if (lastName) updates.lastName = lastName;
-    if (age) updates.age = age;
+    if (username) updates.username = username;
+    if (phoneNumber) updates.phoneNumber = phoneNumber;
 
     // Update the user's profile
-    const result = await updateUserProfile(userId, updates);
+    const result = await updateUserProfile(userId, updates, imageFile);
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
