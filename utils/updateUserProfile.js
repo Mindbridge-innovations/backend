@@ -1,5 +1,8 @@
 const { db } = require('./firebaseConfig');
 const { getStorage } = require('firebase-admin/storage');
+const { hashPassword } = require('./hash');
+
+
 
 const updateUserProfile = async (userId, updates, imageFile) => {
   const userRef = db.ref(`users/${userId}`);
@@ -9,6 +12,11 @@ const updateUserProfile = async (userId, updates, imageFile) => {
   try {
     const currentUserSnapshot = await userRef.once('value');
     const currentUserData = currentUserSnapshot.val();
+
+    // If there's a new password, hash it
+  if (updates.password) {
+    updates.password=await hashPassword(updates.password)
+  }
 
     // Check if username is being updated and handle accordingly
     if (updates.username && updates.username !== currentUserData.username) {

@@ -97,7 +97,7 @@ router.get('/api/verify', async (req, res) => {
 router.put('/api/user/profile', authenticateToken, upload.single('profileImage'), async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { firstName, lastName, username, phoneNumber } = req.body;
+    const { firstName, lastName, username, phoneNumber,password } = req.body;
     const imageFile = req.file;
     console.log(req.file);
 
@@ -106,7 +106,8 @@ router.put('/api/user/profile', authenticateToken, upload.single('profileImage')
       firstName: firstName,
       lastName: lastName,
       username: username,
-      phoneNumber: phoneNumber
+      phoneNumber: phoneNumber,
+      password:password
     };
 
     // Update the user's profile
