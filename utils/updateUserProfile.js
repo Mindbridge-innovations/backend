@@ -1,26 +1,32 @@
 // utils/updateUserProfile.js
-const { admin, db, storage } = require('./firebaseConfig');
+const { db } = require('./firebaseConfig');
+const { getStorage } = require('firebase-admin/storage');
+
 
 const updateUserProfile = async (userId, updates, imageFile) => {
   const userRef = db.ref(`users/${userId}`);
+  const storage = getStorage();
 
   try {
     if (imageFile) {
-      // Upload the image to Firebase Storage
-      const imageRef = storage.ref(`profileImages/${userId}/${imageFile.originalname}`);
-      await imageRef.put(imageFile.buffer);
-      // Get URL of the uploaded image and update the profileImage field
-      const imageUrl = await imageRef.getDownloadURL();
-      updates.profileImage = imageUrl;
+      const imageRef = storage.bucket().file(`profileImages/${userId}/${imageFile.originalname}`);
+      await imageRef.save(imageFile.buffer, {
+        contentType: imageFile.mimetype
+      });
+
+      const [url] = await imageRef.getSignedUrl({
+        action: 'read',
+        expires: '03-09-2491'
+      });
+
+      updates.profileImage = url;
     }
 
-    // Update the user's profile information in the database
     await userRef.update(updates);
     return { success: true, message: 'User profile updated successfully' };
   } catch (error) {
     console.error(`Error updating user profile: ${error.message}`);
-    throw error;
+    return { success: false, message: error.message };  // Send error message back to client
   }
 };
-
 module.exports = updateUserProfile;

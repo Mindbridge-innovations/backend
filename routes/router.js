@@ -97,15 +97,17 @@ router.get('/api/verify', async (req, res) => {
 router.put('/api/user/profile', authenticateToken, upload.single('profileImage'), async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { firstName, lastName, username,phoneNumber } = req.body;
+    const { firstName, lastName, username, phoneNumber } = req.body;
     const imageFile = req.file;
+    console.log(req.file);
 
     // Construct the updates object
-    const updates = {};
-    if (firstName) updates.firstName = firstName;
-    if (lastName) updates.lastName = lastName;
-    if (username) updates.username = username;
-    if (phoneNumber) updates.phoneNumber = phoneNumber;
+    const updates = {
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      phoneNumber: phoneNumber
+    };
 
     // Update the user's profile
     const result = await updateUserProfile(userId, updates, imageFile);
@@ -114,7 +116,6 @@ router.put('/api/user/profile', authenticateToken, upload.single('profileImage')
     res.status(500).json({ message: error.message });
   }
 });
-
 // Get user details endpoint
 router.get('/api/user', authenticateToken, async (req, res) => {
   try {
