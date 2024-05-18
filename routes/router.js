@@ -1,8 +1,11 @@
 // routes/router.js
 const express = require('express');
 const router = express.Router();
+const bcrypt=require('bcryptjs')
 const multer = require('multer');
 const { createFeedback } = require('../utils/feedback');
+const { db } = require('../utils/firebaseConfig');
+
 
 // Set up multer for file handling
 const upload = multer({ storage: multer.memoryStorage() });
@@ -20,6 +23,7 @@ const {createRating}=require('../utils/rating');
 const {getRatingsAndClientDetails}=require('../utils/getRatings');
 const { getFeedbacksAndTherapists } = require('../utils/getFeedbacks'); // Adjust the path as necessary
 const {getMatchedTherapistsForUser}=require('../utils/fetchMatchedTherapists');
+const updateUserPassword=require('../utils/updateUserPassword')
 
 
 
@@ -97,18 +101,15 @@ router.get('/api/verify', async (req, res) => {
 router.put('/api/user/profile', authenticateToken, upload.single('profileImage'), async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { firstName, lastName, username, phoneNumber,password } = req.body;
+    const { firstName, lastName, username,phoneNumber } = req.body;
     const imageFile = req.file;
-    console.log(req.file);
 
     // Construct the updates object
-    const updates = {
-      firstName: firstName,
-      lastName: lastName,
-      username: username,
-      phoneNumber: phoneNumber,
-      password:password
-    };
+    const updates = {};
+    if (firstName) updates.firstName = firstName;
+    if (lastName) updates.lastName = lastName;
+    if (username) updates.username = username;
+    if (phoneNumber) updates.phoneNumber = phoneNumber;
 
     // Update the user's profile
     const result = await updateUserProfile(userId, updates, imageFile);
@@ -117,6 +118,7 @@ router.put('/api/user/profile', authenticateToken, upload.single('profileImage')
     res.status(500).json({ message: error.message });
   }
 });
+
 // Get user details endpoint
 router.get('/api/user', authenticateToken, async (req, res) => {
   try {
@@ -235,5 +237,37 @@ router.get('/api/matched-therapists', authenticateToken, async (req, res) => {
       res.status(500).json({ message: error.message });
   }
 });
+
+//api to update user password
+router.put('/api/user/change-password', authenticateToken, async (req, res) => {
+  const userId = req.user.userId;
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+      // Retrieve the current user's hashed password from Firebase
+      const userRef = db.ref(`users/${userId}`);
+      const snapshot = await userRef.once('value');
+      const user = snapshot.val();
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+          return res.status(401).json({ message: "Incorrect old password" });
+      }
+
+      const saltRounds = 10;
+      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+      await updateUserPassword(userId, hashedNewPassword);
+
+      res.status(200).json({ message: "Password successfully updated" });
+  } catch (error) {
+      console.error('Error updating password:', error);
+      res.status(500).json({ message: error.message });
+  }
+});
+
 
 module.exports = router;
