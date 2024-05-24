@@ -238,7 +238,7 @@ router.get('/api/matched-therapists', authenticateToken, async (req, res) => {
   }
 });
 
-//api to update user password
+//api to update user password for authenticated users without using an email
 router.put('/api/user/change-password', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   const { oldPassword, newPassword } = req.body;
