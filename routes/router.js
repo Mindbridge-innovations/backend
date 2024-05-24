@@ -262,7 +262,7 @@ router.put('/api/user/change-password', authenticateToken, async (req, res) => {
       const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
       await updateUserPassword(userId, hashedNewPassword);
 
-      res.status(200).json({ message: "Password successfully updated" });
+      res.status(200).json({ message: "Your password has been successfully updated" });
   } catch (error) {
       console.error('Error updating password:', error);
       res.status(500).json({ message: error.message });
