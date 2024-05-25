@@ -5,9 +5,6 @@ const bcrypt=require('bcryptjs')
 const multer = require('multer');
 const { createFeedback } = require('../utils/feedback');
 const { db } = require('../utils/firebaseConfig');
-
-
-// Set up multer for file handling
 const upload = multer({ storage: multer.memoryStorage() });
 const {registerUser} = require('../utils/register')
 const {loginUser} = require('../utils/login')
@@ -23,10 +20,9 @@ const {createRating}=require('../utils/rating');
 const {getRatingsAndClientDetails}=require('../utils/getRatings');
 const { getFeedbacksAndTherapists } = require('../utils/getFeedbacks'); // Adjust the path as necessary
 const {getMatchedTherapistsForUser}=require('../utils/fetchMatchedTherapists');
-const updateUserPassword=require('../utils/updateUserPassword')
-
-
-
+const updateUserPassword=require('../utils/updateUserPassword');
+const verifyTherapist = require('../middleware/verifyTherapist');
+const { generateVRToken } = require('../utils/generateVRToken');
 
 
 router.post('/api/register', async (req, res) => {;
@@ -224,8 +220,6 @@ router.get('/api/client/feedbacks', authenticateToken,async (req, res) => {
   }
 });
 
-// routes/router.js
-
 // Endpoint to get matched therapists for a user
 router.get('/api/matched-therapists', authenticateToken, async (req, res) => {
   try {
@@ -269,5 +263,14 @@ router.put('/api/user/change-password', authenticateToken, async (req, res) => {
   }
 });
 
+//generate VR Tokens
+router.get('/api/generate-vr-token', authenticateToken, verifyTherapist, async (req, res) => {
+  try {
+    const token = await generateVRToken();
+    res.status(200).json({ token });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;
