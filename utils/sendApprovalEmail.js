@@ -7,7 +7,7 @@ const sendApprovalProcessEmail = async (email, firstName) => {
       name: firstName,
       intro: "Your MindBridge account has been verified!",
       action: {
-        instructions: "Please wait while we review your credentials. We will notify you once your account is approved and fully activated.",
+        instructions: "Please click the button and wait while we review your credentials. We will notify you once your account is approved and fully activated.",
         button: {
           color: "#22BC66",
           text: "Visit MindBridge",
