@@ -28,6 +28,11 @@ const loginUser = async (email, password) => {
         throw new Error('User is not verified yet! Please check your inbox for verification mail.');
       }
 
+      // Additional check for therapists
+      if (userData.role === 'therapist' && !userData.isApproved) {
+        throw new Error('Therapist account not approved. Please wait for your credentials to be verified.');
+      }
+
       // Compare the provided password with the hashed password stored in the database
       const passwordMatch = await bcrypt.compare(password, userData.password);
       if (!passwordMatch) {

@@ -45,6 +45,7 @@ const registerUser = async (firstName, lastName, email, phoneNumber, username, p
       isVerified: false,
       verificationToken,
       ...(role === "client" && { isMatched: false }),
+      ...(role === "therapist" && { isApproved: false }),
     };
 
     await newUserRef.set(userData);
