@@ -4,9 +4,9 @@ const ShortUniqueId = require('short-unique-id');
 
 const generateVRToken = async () => {
   const uid = new ShortUniqueId({ length: 6 });
-  const token = uid();
+  const token = uid.rnd();
 
-  const tokenRef = db.ref(`VRTokens/${token}`);
+  const tokenRef = db.ref(`tokens/${token}`);
   const tokenSnapshot = await tokenRef.once('value');
 
   if (tokenSnapshot.exists()) {
