@@ -23,6 +23,7 @@ const {getMatchedTherapistsForUser}=require('../utils/fetchMatchedTherapists');
 const updateUserPassword=require('../utils/updateUserPassword');
 const verifyTherapist = require('../middleware/verifyTherapist');
 const { generateVRToken } = require('../utils/generateVRToken');
+const { generateToken } = require('../utils/azureHealthBot');
 
 
 router.post('/api/register', async (req, res) => {;
@@ -270,6 +271,18 @@ router.get('/api/generate-vr-token', authenticateToken, verifyTherapist, async (
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to generate a token for the Azure Health Bot
+router.post('/api/chatBot', authenticateToken, async (req, res) => {
+  const { userId, userName, locale, lat, long } = req.body;
+
+  try {
+      const result = await generateToken(userId, userName, locale, lat, long);
+      res.status(200).json(result);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
   }
 });
 
