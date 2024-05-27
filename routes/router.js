@@ -24,6 +24,7 @@ const updateUserPassword=require('../utils/updateUserPassword');
 const verifyTherapist = require('../middleware/verifyTherapist');
 const { generateVRToken } = require('../utils/generateVRToken');
 const { generateToken } = require('../utils/azureHealthBot');
+const { createConversation } = require('../utils/fixieAI');
 
 
 router.post('/api/register', async (req, res) => {;
@@ -283,6 +284,18 @@ router.post('/api/chatBot', authenticateToken, async (req, res) => {
       res.status(200).json(result);
   } catch (error) {
       res.status(500).json({ message: error.message });
+  }
+});
+
+
+router.post('/api/fixie/conversation', async (req, res) => {
+  const { message, generateInitialMessage } = req.body;
+
+  try {
+    const result = await createConversation(message, generateInitialMessage);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
