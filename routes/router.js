@@ -25,6 +25,8 @@ const verifyTherapist = require('../middleware/verifyTherapist');
 const { generateVRToken } = require('../utils/generateVRToken');
 const { generateToken } = require('../utils/azureHealthBot');
 const { createConversation } = require('../utils/fixieAI');
+const { updateResponses } = require('../utils/updateResponses');
+
 
 
 router.post('/api/register', async (req, res) => {;
@@ -294,6 +296,18 @@ router.post('/api/fixie/conversation', async (req, res) => {
   try {
     const result = await createConversation(message, generateInitialMessage);
     res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Endpoint to update user responses
+router.put('/api/user/updateResponses', authenticateToken,async (req, res) => {
+  const userId = req.user.userId; // Extracted from JWT token
+  const {responses } = req.body;
+  try {
+    await updateResponses(userId, responses);
+    res.status(200).json({ success: true, message: 'Responses updated successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
