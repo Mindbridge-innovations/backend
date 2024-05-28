@@ -56,21 +56,36 @@ const matchClientsWithTherapists = async (requestingClientId) => {
   const therapists = therapistsSnapshot.val();
   const clients = clientsSnapshot.val();
 
-  // Filter out clients who are already matched or do not want to be matched
-  const unmatchedClients = Object.keys(clients).filter((clientId) => {
-    const client = clients[clientId];
-    return !client.isMatched && (!requestingClientId || clientId === requestingClientId);
-  });
+  // Retrieve existing matches if any
+  const existingMatchesSnapshot = await matchesRef.once('value');
+  const existingMatches = existingMatchesSnapshot.val() || {};
 
-  // Create an array to store potential matches
+  // Process each client
   let potentialMatches = [];
+  for (const clientId in clients) {
+    const client = clients[clientId];
+    if (clientId !== requestingClientId) continue; // Only process the requesting client
 
-  // Calculate scores for each unmatched client-therapist pair
-  for (const clientId of unmatchedClients) {
+    // If client is already matched and requesting a new match, remove from current match
+    if (client.isMatched) {
+      for (const therapistId in existingMatches) {
+        const index = existingMatches[therapistId].indexOf(clientId);
+        if (index > -1) {
+          existingMatches[therapistId].splice(index, 1); // Remove client from previous therapist's list
+          await matchesRef.child(therapistId).set(existingMatches[therapistId]); // Update the database
+          break;
+        }
+      }
+    }
+
     const clientResponsesSnapshot = await responsesRef.child(clientId).once('value');
     const clientResponses = clientResponsesSnapshot.val();
 
     for (const therapistId in therapists) {
+      if (client.doNotMatchTherapistIds && client.doNotMatchTherapistIds.includes(therapistId)) {
+        continue; // Skip therapists in the do not match list
+      }
+
       const therapistResponsesSnapshot = await responsesRef.child(therapistId).once('value');
       const therapistResponses = therapistResponsesSnapshot.val();
 
@@ -82,13 +97,11 @@ const matchClientsWithTherapists = async (requestingClientId) => {
   // Sort potential matches by score
   potentialMatches.sort((a, b) => b.score - a.score);
 
-  // Distribute clients to therapists, ensuring each client is only matched once
   const matches = {};
   const matchedClients = new Set(); // Keep track of clients that have been matched
 
   potentialMatches.forEach(match => {
     if (matchedClients.has(match.clientId)) {
-      // Skip this match as the client is already matched
       return;
     }
 
@@ -101,8 +114,12 @@ const matchClientsWithTherapists = async (requestingClientId) => {
       matches[match.therapistId].push(match.clientId);
       matchedClients.add(match.clientId); // Mark this client as matched
 
-      // Set the client's isMatched field to true
-      usersRef.child(match.clientId).update({ isMatched: true });
+      // Update the client's isMatched field and doNotMatchTherapistIds list
+      const updatedClientData = {
+        isMatched: true,
+        doNotMatchTherapistIds: [...(clients[match.clientId].doNotMatchTherapistIds || []), match.therapistId]
+      };
+      usersRef.child(match.clientId).update(updatedClientData);
     }
   });
 
