@@ -12,11 +12,11 @@ const swaggerDefinition = {
   },
   servers: [
     {
-        url: 'https://backend-production-0710.up.railway.app/v1/api',
+        url: 'https://backend-production-0710.up.railway.app/v1',
         description: 'Production server',
       },
     {
-      url: 'http://localhost:3000/v1/api',
+      url: 'http://localhost:3000/v1',
       description: 'Development server',
     }
   ],

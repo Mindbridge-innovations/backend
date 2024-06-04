@@ -1,3 +1,4 @@
+//utils/updateUserProfile.js
 const { db } = require('./firebaseConfig');
 const { getStorage } = require('firebase-admin/storage');
 

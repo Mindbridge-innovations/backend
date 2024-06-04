@@ -27,8 +27,55 @@ const { generateToken } = require('../utils/azureHealthBot');
 const { createConversation } = require('../utils/fixieAI');
 const { updateResponses } = require('../utils/updateResponses');
 
-
-
+//register
+/**
+ * @swagger
+ * /api/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Registers a new user and sends a verification email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - email
+ *               - phoneNumber
+ *               - username
+ *               - password
+ *               - role
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               phoneNumber:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 format: password
+ *               role:
+ *                 type: string
+ *                 description: "User role (e.g., client, therapist)"
+ *               responses:
+ *                 type: object
+ *                 additionalProperties:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       500:
+ *         description: Error message
+ */
 router.post('/api/register', async (req, res) => {;
     try {
       const { firstName, lastName,email,phoneNumber,username,password,role,responses} = req.body;
@@ -38,8 +85,47 @@ router.post('/api/register', async (req, res) => {;
       res.status(500).json({ message: error.message });
     }
   });
-  
- router.post('/api/login', async (req, res) => {
+
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: User login
+ *     description: Logs in a user and returns a token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 userData:
+ *                   type: object
+ *       400:
+ *         description: Email and password are required
+ *       500:
+ *         description: Error message
+ */
+router.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body; 
     if (!email || !password) {
@@ -53,6 +139,30 @@ router.post('/api/register', async (req, res) => {;
 });
 
 // Forgot password endpoint
+/**
+ * @swagger
+ * /api/forgot-password:
+ *   post:
+ *     summary: Initiates a password reset process
+ *     description: Sends a password reset token to the user's email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Password reset token sent to email
+ *       500:
+ *         description: Error message
+ */
 router.post('/api/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
@@ -64,6 +174,39 @@ router.post('/api/forgot-password', async (req, res) => {
 });
 
 // Reset password endpoint
+/**
+ * @swagger
+ * /api/reset-password:
+ *   post:
+ *     summary: Reset user's password
+ *     description: Allows a user to reset their password using a token received via email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               token:
+ *                 type: string
+ *                 description: "Reset token sent to user's email"
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *                 description: "New password for the user"
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *       500:
+ *         description: Error message
+ */
 router.post('/api/reset-password', async (req, res) => {
   try {
     const { email, token, newPassword } = req.body;
@@ -75,6 +218,29 @@ router.post('/api/reset-password', async (req, res) => {
 })
 
 //verify new user
+/**
+ * @swagger
+ * /api/verify:
+ *   get:
+ *     summary: Verify new user
+ *     description: Verifies a new user's email with a token sent to their email.
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         description: Verification token sent to the user's email.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User verified successfully, redirects to the application URL.
+ *       400:
+ *         description: Verification token is required
+ *       404:
+ *         description: User not found or already verified
+ *       500:
+ *         description: Error message
+ */
 router.get('/api/verify', async (req, res) => {
   try {
     const { token } = req.query;
