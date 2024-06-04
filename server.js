@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const router = require('./routes/router');
+const { swaggerSpec, swaggerUi } = require('./swagger');
 
 const port = process.env.PORT || 3000;
 const app = express()
@@ -20,7 +21,11 @@ app.use(function (err, req, res, next) {
     .send({ message: err.message, stack: err.stack });
 });
 
+//routes
 app.use('/v1', router);
+
+// Serve Swagger docs at /docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 
