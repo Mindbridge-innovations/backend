@@ -296,6 +296,12 @@ router.get('/api/verify', async (req, res) => {
  *         description: User profile updated successfully
  *       500:
  *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 router.put('/api/user/profile', authenticateToken, upload.single('profileImage'), async (req, res) => {
   try {
@@ -332,6 +338,12 @@ router.put('/api/user/profile', authenticateToken, upload.single('profileImage')
  *         description: User details retrieved successfully
  *       500:
  *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 router.get('/api/user', authenticateToken, async (req, res) => {
   try {
@@ -380,6 +392,12 @@ router.get('/api/user', authenticateToken, async (req, res) => {
  *         description: Appointment created successfully
  *       500:
  *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 router.post('/api/appointments', authenticateToken, async (req, res) => {
   try {
@@ -410,6 +428,12 @@ router.post('/api/appointments', authenticateToken, async (req, res) => {
  *         description: Matching process completed successfully
  *       500:
  *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 router.post('/api/match', authenticateToken,async (req, res) => {
   const userId = req.user.userId;
@@ -452,6 +476,12 @@ router.post('/api/match', authenticateToken,async (req, res) => {
  *         description: Rating submitted successfully
  *       500:
  *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 router.post('/api/ratings', authenticateToken, async (req, res) => {
   try {
@@ -470,6 +500,43 @@ router.post('/api/ratings', authenticateToken, async (req, res) => {
 
 
 // Endpoint for submitting feedback
+/**
+ * @swagger
+ * /api/feedbacks:
+ *   post:
+ *     summary: Submit feedback
+ *     description: Allows authenticated users to submit feedback with an optional file attachment.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               feedback:
+ *                 type: string
+ *                 description: Feedback text
+ *               clientId:
+ *                 type: string
+ *                 description: Client ID associated with the feedback
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: Optional file to accompany the feedback
+ *     responses:
+ *       201:
+ *         description: Feedback submitted successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (req, res) => {
   try {
     // The userId is extracted from the JWT token after authentication
@@ -496,6 +563,26 @@ router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (r
 
 
 // Endpoint to get ratings and client details for a therapist
+/**
+ * @swagger
+ * /api/therapist/ratings:
+ *   get:
+ *     summary: Get ratings and client details
+ *     description: Retrieves ratings and corresponding client details for the authenticated therapist.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Ratings and client details retrieved successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.get('/api/therapist/ratings', authenticateToken, async (req, res) => {
   try {
     const therapistId = req.user.userId; // Assuming the therapist's userId is in the JWT token
@@ -507,6 +594,27 @@ router.get('/api/therapist/ratings', authenticateToken, async (req, res) => {
   }
 });
 
+// Endpoint to get feedbacks and therapists for a client
+/**
+ * @swagger
+ * /api/client/feedbacks:
+ *   get:
+ *     summary: Get feedbacks and therapists
+ *     description: Retrieves feedbacks and corresponding therapist details for the authenticated client.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Feedbacks and therapists retrieved successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.get('/api/client/feedbacks', authenticateToken,async (req, res) => {
   try {
       const userId = req.user.userId; // Assuming you have middleware to authenticate and add user info
@@ -519,6 +627,26 @@ router.get('/api/client/feedbacks', authenticateToken,async (req, res) => {
 });
 
 // Endpoint to get matched therapists for a user
+/**
+ * @swagger
+ * /api/matched-therapists:
+ *   get:
+ *     summary: Get matched therapists
+ *     description: Retrieves matched therapists for the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Matched therapists retrieved successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.get('/api/matched-therapists', authenticateToken, async (req, res) => {
   try {
       const userId = req.user.userId; // Extracted from JWT token
@@ -531,6 +659,43 @@ router.get('/api/matched-therapists', authenticateToken, async (req, res) => {
 });
 
 //api to update user password for authenticated users without using an email
+/**
+ * @swagger
+ * /api/user/change-password:
+ *   put:
+ *     summary: Change user password
+ *     description: Allows authenticated users to change their password.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 format: password
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       401:
+ *         description: Incorrect old password
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.put('/api/user/change-password', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   const { oldPassword, newPassword } = req.body;
@@ -562,6 +727,26 @@ router.put('/api/user/change-password', authenticateToken, async (req, res) => {
 });
 
 //generate VR Tokens
+/**
+ * @swagger
+ * /api/generate-vr-token:
+ *   get:
+ *     summary: Generate VR token
+ *     description: Generates a VR token for authenticated and verified therapists.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: VR token generated successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.get('/api/generate-vr-token', authenticateToken, verifyTherapist, async (req, res) => {
   try {
     const token = await generateVRToken();
@@ -572,6 +757,43 @@ router.get('/api/generate-vr-token', authenticateToken, verifyTherapist, async (
 });
 
 // Route to generate a token for the Azure Health Bot
+/**
+ * @swagger
+ * /api/chatBot:
+ *   post:
+ *     summary: Generate token for Azure Health Bot
+ *     description: Generates a token for interacting with the Azure Health Bot.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               userName:
+ *                 type: string
+ *               locale:
+ *                 type: string
+ *               lat:
+ *                 type: number
+ *               long:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Token generated successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.post('/api/chatBot', authenticateToken, async (req, res) => {
   const { userId, userName, locale, lat, long } = req.body;
 
@@ -583,7 +805,35 @@ router.post('/api/chatBot', authenticateToken, async (req, res) => {
   }
 });
 
-
+/**
+ * @swagger
+ * /api/fixie/conversation:
+ *   post:
+ *     summary: Create conversation
+ *     description: Initiates a conversation with Fixie AI.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *               generateInitialMessage:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Conversation created successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.post('/api/fixie/conversation', async (req, res) => {
   const { message, generateInitialMessage } = req.body;
 
@@ -596,6 +846,37 @@ router.post('/api/fixie/conversation', async (req, res) => {
 });
 
 // Endpoint to update user responses
+/**
+ * @swagger
+ * /api/user/updateResponses:
+ *   put:
+ *     summary: Update user responses
+ *     description: Updates the responses for the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               responses:
+ *                 type: object
+ *                 additionalProperties:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Responses updated successfully
+ *       500:
+ *         description: Error message
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 router.put('/api/user/updateResponses', authenticateToken,async (req, res) => {
   const userId = req.user.userId; // Extracted from JWT token
   const {responses } = req.body;
