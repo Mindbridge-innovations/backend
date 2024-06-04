@@ -1,3 +1,4 @@
+//utils/fetchMatchedTherapits.js
 const { db } = require('./firebaseConfig');
 
 const getMatchedTherapistsForUser = async (userId) => {

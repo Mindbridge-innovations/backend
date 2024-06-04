@@ -264,6 +264,39 @@ router.get('/api/verify', async (req, res) => {
 
 // Protected routes
 //Route to update user profile
+/**
+ * @swagger
+ * /api/user/profile:
+ *   put:
+ *     summary: Update user profile
+ *     description: Allows authenticated users to update their profile information.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: Profile image file
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *       500:
+ *         description: Error message
+ */
 router.put('/api/user/profile', authenticateToken, upload.single('profileImage'), async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -286,6 +319,20 @@ router.put('/api/user/profile', authenticateToken, upload.single('profileImage')
 });
 
 // Get user details endpoint
+/**
+ * @swagger
+ * /api/user:
+ *   get:
+ *     summary: Get user details
+ *     description: Retrieves details of the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User details retrieved successfully
+ *       500:
+ *         description: Error message
+ */
 router.get('/api/user', authenticateToken, async (req, res) => {
   try {
     // The userId is extracted from the JWT token after authentication
@@ -298,6 +345,42 @@ router.get('/api/user', authenticateToken, async (req, res) => {
 });
 
 // Route to create a new appointment
+/**
+ * @swagger
+ * /api/appointments:
+ *   post:
+ *     summary: Create a new appointment
+ *     description: Allows authenticated users to create a new appointment.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               date:
+ *                 type: string
+ *                 format: date
+ *               time:
+ *                 type: string
+ *               reason:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               appointmentType:
+ *                 type: string
+ *               therapistId:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Appointment created successfully
+ *       500:
+ *         description: Error message
+ */
 router.post('/api/appointments', authenticateToken, async (req, res) => {
   try {
     // The userId is extracted from the JWT token after authentication
@@ -314,6 +397,20 @@ router.post('/api/appointments', authenticateToken, async (req, res) => {
 });
 
 // Route to trigger the matching process
+/**
+ * @swagger
+ * /api/match:
+ *   post:
+ *     summary: Trigger the matching process
+ *     description: Matches clients with therapists based on their profiles and preferences.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Matching process completed successfully
+ *       500:
+ *         description: Error message
+ */
 router.post('/api/match', authenticateToken,async (req, res) => {
   const userId = req.user.userId;
   try {
@@ -325,6 +422,37 @@ router.post('/api/match', authenticateToken,async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/ratings:
+ *   post:
+ *     summary: Submit a rating
+ *     description: Allows authenticated users to submit a rating for a therapist.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 format: int32
+ *                 description: Rating score
+ *               review:
+ *                 type: string
+ *                 description: Review text
+ *               therapistId:
+ *                 type: string
+ *                 description: ID of the therapist being rated
+ *     responses:
+ *       201:
+ *         description: Rating submitted successfully
+ *       500:
+ *         description: Error message
+ */
 router.post('/api/ratings', authenticateToken, async (req, res) => {
   try {
     // The userId is extracted from the JWT token after authentication

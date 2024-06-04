@@ -1,3 +1,4 @@
+//utils/updateUserPasswors.js
 const { db } = require('./firebaseConfig');
 
 const updateUserPassword = async (userId, hashedPassword) => {
