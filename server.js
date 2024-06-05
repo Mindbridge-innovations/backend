@@ -28,7 +28,7 @@ app.use('/v1', router);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
-
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-   });
+module.exports = app;
+// app.listen(port, () => {
+//     console.log(`Server is running at http://localhost:${port}`);
+//    });
