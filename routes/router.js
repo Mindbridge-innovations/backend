@@ -372,21 +372,32 @@ router.get('/api/user', authenticateToken, async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               date:
- *                 type: string
- *                 format: date
- *               time:
- *                 type: string
- *               reason:
- *                 type: string
- *               description:
- *                 type: string
- *               appointmentType:
- *                 type: string
- *               therapistId:
- *                 type: string
- *               status:
- *                 type: string
+ *               appointmentData:
+ *                 type: object
+ *                 required:
+ *                   - date
+ *                   - time
+ *                   - reason
+ *                   - description
+ *                   - appointmentType
+ *                   - therapistId
+ *                   - status
+ *                 properties:
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   time:
+ *                     type: string
+ *                   reason:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   appointmentType:
+ *                     type: string
+ *                   therapistId:
+ *                     type: string
+ *                   status:
+ *                     type: string
  *     responses:
  *       201:
  *         description: Appointment created successfully

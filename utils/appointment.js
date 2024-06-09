@@ -1,5 +1,6 @@
 // utils/appointment.js
 const { admin, db } = require('./firebaseConfig');
+const sendAppointmentEmail = require('./sendAppointmentEmail');
 
 const createAppointment = async (userId, appointmentData) => {
   const appointmentsRef = db.ref('appointments');
@@ -21,6 +22,9 @@ const createAppointment = async (userId, appointmentData) => {
 
   // Save the appointment to the database
   await newAppointmentRef.set(newAppointment);
+
+  // Send email to therapist
+  await sendAppointmentEmail(newAppointment, userId);
 
   return { success: true, message: 'Appointment created successfully', appointmentId: newAppointmentRef.key };
 };
