@@ -26,6 +26,7 @@ const { generateVRToken } = require('../utils/generateVRToken');
 const { generateToken } = require('../utils/azureHealthBot');
 const { createConversation } = require('../utils/fixieAI');
 const { updateResponses } = require('../utils/updateResponses');
+const { getInteractionsByUserId } = require('../utils/getInteractions');
 
 //register
 /**
@@ -898,5 +899,55 @@ router.put('/api/user/updateResponses', authenticateToken,async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+/**
+ * @swagger
+ * /api/interactions/{userId}:
+ *   get:
+ *     summary: Retrieve interactions for a user
+ *     description: Returns a list of interactions based on the user ID.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: The ID of the user to retrieve interactions for.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved interactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties:
+ *                 type: object
+ *                 properties:
+ *                   object:
+ *                     type: string
+ *                   timestamp:
+ *                     type: string
+ *                     format: date-time
+ *       404:
+ *         description: No interactions found
+ *       500:
+ *         description: Server error
+ */
+router.get('/api/interactions/:userId', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const interactions = await getInteractionsByUserId(userId);
+    res.status(200).json(interactions);
+  } catch (error) {
+    if (error.message === 'No interactions found for this user.') {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+});
+
 
 module.exports = router;
