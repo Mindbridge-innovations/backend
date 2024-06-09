@@ -1,4 +1,4 @@
-// Assuming you use sinon for stubbing
+// tests/middleware.test.js
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
 const httpMocks = require('node-mocks-http');
