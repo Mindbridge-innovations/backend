@@ -2,7 +2,7 @@
 const { db } = require('./firebaseConfig');
 const ShortUniqueId = require('short-unique-id');
 
-const generateVRToken = async () => {
+const generateVRToken = async (userId, therapistId) => {
   const uid = new ShortUniqueId({ length: 6 });
   const token = uid.rnd();
 
@@ -15,6 +15,8 @@ const generateVRToken = async () => {
 
   await tokenRef.set({
     token: token,
+    userId: userId,  // Include the userId in the token data
+    therapistId: therapistId,
     isActive: true,
     createdAt: new Date().toISOString()
   });

@@ -742,26 +742,42 @@ router.put('/api/user/change-password', authenticateToken, async (req, res) => {
 /**
  * @swagger
  * /api/generate-vr-token:
- *   get:
+ *   post:
  *     summary: Generate VR token
- *     description: Generates a VR token for authenticated and verified therapists.
+ *     description: Generates a VR token for authenticated and verified therapists, linked to a specific user.
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user for whom the token is being generated.
  *     responses:
  *       200:
  *         description: VR token generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
  *       500:
  *         description: Error message
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
-router.get('/api/generate-vr-token', authenticateToken, verifyTherapist, async (req, res) => {
+router.post('/api/generate-vr-token', authenticateToken, verifyTherapist, async (req, res) => {
   try {
-    const token = await generateVRToken();
+    const { userId } = req.body;
+    const therapistId = req.user.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const token = await generateVRToken(userId, therapistId);
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ message: error.message });
