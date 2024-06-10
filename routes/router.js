@@ -28,6 +28,8 @@ const { createConversation } = require('../utils/fixieAI');
 const { updateResponses } = require('../utils/updateResponses');
 const { getInteractionsByToken } = require('../utils/getInteractions');
 const { getTokenByUserId } = require('../utils/getTokenByUserId');
+const { getMatchedPatientsForTherapist } = require('../utils/fetchMatchedPatients');
+
 
 //register
 /**
@@ -965,6 +967,18 @@ router.get('/api/interactions/:userId', authenticateToken, async (req, res) => {
     } else {
       res.status(500).json({ message: 'Server error' });
     }
+  }
+});
+
+// Endpoint to get matched patients for a therapist
+router.get('/api/matched-patients', authenticateToken, async (req, res) => {
+  try {
+      const therapistId = req.user.userId;
+      const matchedPatients = await getMatchedPatientsForTherapist(therapistId);
+      res.status(200).json(matchedPatients);
+  } catch (error) {
+      console.error('Error fetching matched patients:', error);
+      res.status(500).json({ message: error.message });
   }
 });
 
