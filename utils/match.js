@@ -1,7 +1,6 @@
 // utils/match.js
 const { admin, db } = require('./firebaseConfig');
-
-
+const sendMatchEmails = require('./sendMatchEmail');
 
 // Function to calculate the score based on responses
 const calculateMatchScore = (clientResponses, therapistResponses) => {
@@ -99,7 +98,7 @@ const matchClientsWithTherapists = async (requestingClientId) => {
   const matches = { ...existingMatches }; // Initialize matches with existing matches
   const matchedClients = new Set(); // Keep track of clients that have been matched
 
-  potentialMatches.forEach(match => {
+  potentialMatches.forEach(async match => {
     if (matchedClients.has(match.clientId)) {
       return;
     }
@@ -118,7 +117,19 @@ const matchClientsWithTherapists = async (requestingClientId) => {
         isMatched: true,
         doNotMatchTherapistIds: [...(clients[match.clientId].doNotMatchTherapistIds || []), match.therapistId]
       };
-      usersRef.child(match.clientId).update(updatedClientData);
+      await usersRef.child(match.clientId).update(updatedClientData);
+
+      // Get therapist and client details for email content
+      const therapist = therapists[match.therapistId];
+      const client = clients[match.clientId];
+
+      // Send match emails using the separate module
+      await sendMatchEmails(
+        client.email,
+        therapist.email,
+        client.username,
+        therapist.username
+      );
     }
   });
 
