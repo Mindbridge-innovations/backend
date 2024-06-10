@@ -39,7 +39,6 @@ const calculateMatchScore = (clientResponses, therapistResponses) => {
   return score;
 };
 
-// Function to match clients with therapists
 const matchClientsWithTherapists = async (requestingClientId) => {
   const usersRef = db.ref('users');
   const responsesRef = db.ref('responses');
@@ -97,7 +96,7 @@ const matchClientsWithTherapists = async (requestingClientId) => {
   // Sort potential matches by score
   potentialMatches.sort((a, b) => b.score - a.score);
 
-  const matches = {};
+  const matches = { ...existingMatches }; // Initialize matches with existing matches
   const matchedClients = new Set(); // Keep track of clients that have been matched
 
   potentialMatches.forEach(match => {
@@ -131,7 +130,5 @@ const matchClientsWithTherapists = async (requestingClientId) => {
 
   return matches;
 };
-
-
 
 module.exports = { matchClientsWithTherapists };
