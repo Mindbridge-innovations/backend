@@ -1,26 +1,26 @@
 // routes/router.js
 const express = require('express');
 const router = express.Router();
-const bcrypt=require('bcryptjs')
+const bcrypt = require('bcryptjs')
 const multer = require('multer');
 const { createFeedback } = require('../utils/feedback');
 const { db } = require('../utils/firebaseConfig');
 const upload = multer({ storage: multer.memoryStorage() });
-const {registerUser} = require('../utils/register')
-const {loginUser} = require('../utils/login')
+const { registerUser } = require('../utils/register')
+const { loginUser } = require('../utils/login')
 const generatePasswordResetToken = require('../utils/generatePasswordResetToken');
 const resetPassword = require('../utils/resetPassword');
 const authenticateToken = require('../middleware/authenticateToken');
 const updateUserProfile = require('../utils/updateUserProfile');
 const verifyUser = require('../utils/verifyUser');
 const { getUserDetails } = require('../utils/getUser');
-const {createAppointment} = require('../utils/appointment')
+const { createAppointment } = require('../utils/appointment')
 const { matchClientsWithTherapists } = require('../utils/match');
-const {createRating}=require('../utils/rating');
-const {getRatingsAndClientDetails}=require('../utils/getRatings');
+const { createRating } = require('../utils/rating');
+const { getRatingsAndClientDetails } = require('../utils/getRatings');
 const { getFeedbacksAndTherapists } = require('../utils/getFeedbacks'); // Adjust the path as necessary
-const {getMatchedTherapistsForUser}=require('../utils/fetchMatchedTherapists');
-const updateUserPassword=require('../utils/updateUserPassword');
+const { getMatchedTherapistsForUser } = require('../utils/fetchMatchedTherapists');
+const updateUserPassword = require('../utils/updateUserPassword');
 const verifyTherapist = require('../middleware/verifyTherapist');
 const { generateVRToken } = require('../utils/generateVRToken');
 const { generateToken } = require('../utils/azureHealthBot');
@@ -78,15 +78,16 @@ const { getTokenByUserId } = require('../utils/getTokenByUserId');
  *       500:
  *         description: Error message
  */
-router.post('/api/register', async (req, res) => {;
-    try {
-      const { firstName, lastName,email,phoneNumber,username,password,role,responses} = req.body;
-      const result = await registerUser(firstName, lastName,email,phoneNumber,username,password,role,responses);
-      res.status(201).json(result);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+router.post('/api/register', async (req, res) => {
+  ;
+  try {
+    const { firstName, lastName, email, phoneNumber, username, password, role, responses } = req.body;
+    const result = await registerUser(firstName, lastName, email, phoneNumber, username, password, role, responses);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 /**
  * @swagger
@@ -129,7 +130,7 @@ router.post('/api/register', async (req, res) => {;
  */
 router.post('/api/login', async (req, res) => {
   try {
-    const { email, password } = req.body; 
+    const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -308,7 +309,7 @@ router.get('/api/verify', async (req, res) => {
 router.put('/api/user/profile', authenticateToken, upload.single('profileImage'), async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { firstName, lastName, username,phoneNumber } = req.body;
+    const { firstName, lastName, username, phoneNumber } = req.body;
     const imageFile = req.file;
 
     // Construct the updates object
@@ -448,7 +449,7 @@ router.post('/api/appointments', authenticateToken, async (req, res) => {
  *       scheme: bearer
  *       bearerFormat: JWT
  */
-router.post('/api/match', authenticateToken,async (req, res) => {
+router.post('/api/match', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   try {
     const matches = await matchClientsWithTherapists(userId);
@@ -567,7 +568,7 @@ router.post('/api/feedbacks', authenticateToken, upload.single('file'), async (r
     }
 
     // Save the feedback and file to the database and storage
-    const result = await createFeedback(userId, feedback, clientId , fileData);
+    const result = await createFeedback(userId, feedback, clientId, fileData);
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -628,14 +629,14 @@ router.get('/api/therapist/ratings', authenticateToken, async (req, res) => {
  *       scheme: bearer
  *       bearerFormat: JWT
  */
-router.get('/api/client/feedbacks', authenticateToken,async (req, res) => {
+router.get('/api/client/feedbacks', authenticateToken, async (req, res) => {
   try {
-      const userId = req.user.userId; // Assuming you have middleware to authenticate and add user info
-      const feedbacksAndTherapists = await getFeedbacksAndTherapists(userId);
-      res.status(200).json(feedbacksAndTherapists);
+    const userId = req.user.userId; // Assuming you have middleware to authenticate and add user info
+    const feedbacksAndTherapists = await getFeedbacksAndTherapists(userId);
+    res.status(200).json(feedbacksAndTherapists);
   } catch (error) {
-      console.error('Error fetching feedbacks and therapists:', error);
-      res.status(500).json({ message: error.message });
+    console.error('Error fetching feedbacks and therapists:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -662,12 +663,12 @@ router.get('/api/client/feedbacks', authenticateToken,async (req, res) => {
  */
 router.get('/api/matched-therapists', authenticateToken, async (req, res) => {
   try {
-      const userId = req.user.userId; // Extracted from JWT token
-      const matchedTherapists = await getMatchedTherapistsForUser(userId);
-      res.status(200).json(matchedTherapists);
+    const userId = req.user.userId; // Extracted from JWT token
+    const matchedTherapists = await getMatchedTherapistsForUser(userId);
+    res.status(200).json(matchedTherapists);
   } catch (error) {
-      console.error('Error fetching matched therapists:', error);
-      res.status(500).json({ message: error.message });
+    console.error('Error fetching matched therapists:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -714,28 +715,28 @@ router.put('/api/user/change-password', authenticateToken, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   try {
-      // Retrieve the current user's hashed password from Firebase
-      const userRef = db.ref(`users/${userId}`);
-      const snapshot = await userRef.once('value');
-      const user = snapshot.val();
+    // Retrieve the current user's hashed password from Firebase
+    const userRef = db.ref(`users/${userId}`);
+    const snapshot = await userRef.once('value');
+    const user = snapshot.val();
 
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-      const isMatch = await bcrypt.compare(oldPassword, user.password);
-      if (!isMatch) {
-          return res.status(401).json({ message: "Incorrect old password" });
-      }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Incorrect old password" });
+    }
 
-      const saltRounds = 10;
-      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-      await updateUserPassword(userId, hashedNewPassword);
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+    await updateUserPassword(userId, hashedNewPassword);
 
-      res.status(200).json({ message: "Your password has been successfully updated" });
+    res.status(200).json({ message: "Your password has been successfully updated" });
   } catch (error) {
-      console.error('Error updating password:', error);
-      res.status(500).json({ message: error.message });
+    console.error('Error updating password:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -827,10 +828,10 @@ router.post('/api/chatBot', authenticateToken, async (req, res) => {
   const { userId, userName, locale, lat, long } = req.body;
 
   try {
-      const result = await generateToken(userId, userName, locale, lat, long);
-      res.status(200).json(result);
+    const result = await generateToken(userId, userName, locale, lat, long);
+    res.status(200).json(result);
   } catch (error) {
-      res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -906,9 +907,9 @@ router.post('/api/fixie/conversation', async (req, res) => {
  *       scheme: bearer
  *       bearerFormat: JWT
  */
-router.put('/api/user/updateResponses', authenticateToken,async (req, res) => {
+router.put('/api/user/updateResponses', authenticateToken, async (req, res) => {
   const userId = req.user.userId; // Extracted from JWT token
-  const {responses } = req.body;
+  const { responses } = req.body;
   try {
     await updateResponses(userId, responses);
     res.status(200).json({ success: true, message: 'Responses updated successfully' });
@@ -952,7 +953,7 @@ router.put('/api/user/updateResponses', authenticateToken,async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/api/interactions/:userId', async (req, res) => {
+router.get('/api/interactions/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
     const token = await getTokenByUserId(userId);
