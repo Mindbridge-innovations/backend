@@ -1,8 +1,8 @@
 // utils/getInteractions.js
 const { db } = require('./firebaseConfig');
 
-const getInteractionsByUserId = async (userId) => {
-  const interactionsRef = db.ref(`interactions/${userId}`);
+const getInteractionsByToken = async (token) => {
+  const interactionsRef = db.ref(`interactions/${token}`);
   const snapshot = await interactionsRef.once('value');
   if (snapshot.exists()) {
     return snapshot.val();
@@ -11,4 +11,4 @@ const getInteractionsByUserId = async (userId) => {
   }
 };
 
-module.exports = { getInteractionsByUserId };
+module.exports = { getInteractionsByToken };

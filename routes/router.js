@@ -26,7 +26,8 @@ const { generateVRToken } = require('../utils/generateVRToken');
 const { generateToken } = require('../utils/azureHealthBot');
 const { createConversation } = require('../utils/fixieAI');
 const { updateResponses } = require('../utils/updateResponses');
-const { getInteractionsByUserId } = require('../utils/getInteractions');
+const { getInteractionsByToken } = require('../utils/getInteractions');
+const { getTokenByUserId } = require('../utils/getTokenByUserId');
 
 //register
 /**
@@ -951,13 +952,14 @@ router.put('/api/user/updateResponses', authenticateToken,async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/api/interactions/:userId', authenticateToken, async (req, res) => {
+router.get('/api/interactions/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
-    const interactions = await getInteractionsByUserId(userId);
+    const token = await getTokenByUserId(userId);
+    const interactions = await getInteractionsByToken(token);
     res.status(200).json(interactions);
   } catch (error) {
-    if (error.message === 'No interactions found for this user.') {
+    if (error.message === 'No interactions found for this user.' || error.message === 'No active token found for this user.') {
       res.status(404).json({ message: error.message });
     } else {
       res.status(500).json({ message: 'Server error' });
