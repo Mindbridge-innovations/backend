@@ -29,6 +29,8 @@ const { updateResponses } = require('../utils/updateResponses');
 const { getInteractionsByToken } = require('../utils/getInteractions');
 const { getTokenByUserId } = require('../utils/getTokenByUserId');
 const { getMatchedPatientsForTherapist } = require('../utils/fetchMatchedPatients');
+const { fetchInteractions, processData } = require('../utils/dataProcessor');
+const { trainModel, predict } = require('../utils/brainModel');
 
 
 //register
@@ -971,6 +973,61 @@ router.get('/api/interactions/:userId', authenticateToken, async (req, res) => {
 });
 
 // Endpoint to get matched patients for a therapist
+/**
+ * @swagger
+ * /api/matched-patients:
+ *   get:
+ *     summary: Get matched patients for the therapist
+ *     description: Fetches all patients matched with the logged-in therapist, including their details and responses.
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful response with matched patients data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   patientId:
+ *                     type: string
+ *                     description: ID of the patient.
+ *                   name:
+ *                     type: string
+ *                     description: Name of the patient.
+ *                   email:
+ *                     type: string
+ *                     description: Email of the patient.
+ *                   responses:
+ *                     type: object
+ *                     description: Responses provided by the patient.
+ *                 
+ *         example:
+ *           - patientId: "123456"
+ *             name: "John Doe"
+ *             email: "john.doe@example.com"
+ *             responses:
+ *               question1: "Answer1"
+ *               question2: "Answer2"
+ *           - patientId: "789012"
+ *             name: "Jane Smith"
+ *             email: "jane.smith@example.com"
+ *             responses:
+ *               question1: "Answer1"
+ *               question2: "Answer2"
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
+ */
 router.get('/api/matched-patients', authenticateToken, async (req, res) => {
   try {
       const therapistId = req.user.userId;
@@ -979,6 +1036,82 @@ router.get('/api/matched-patients', authenticateToken, async (req, res) => {
   } catch (error) {
       console.error('Error fetching matched patients:', error);
       res.status(500).json({ message: error.message });
+  }
+});
+
+
+/**
+ * @swagger
+ * /api/analyze:
+ *   post:
+ *     summary: Analyze interactions and make predictions
+ *     description: Fetches user interactions from Firebase, processes the data, trains a neural network model, and makes predictions.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               No specific request body schema defined as it's not needed for this endpoint.
+ *     responses:
+ *       200:
+ *         description: Successful response with predictions.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 predictions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       0:
+ *                         type: number
+ *                         description: Predicted value for the interaction intensity.
+ *                   example:
+ *                     predictions:
+ *                       - { "0": 0.12359712272882462 }
+ *                       - { "0": 0.20181074738502502 }
+ *                       - { "0": 0.20181074738502502 }
+ *                       - { "0": 0.11557693779468536 }
+ *                       - { "0": 0.12019272893667221 }
+ *                       - { "0": 0.12202335894107819 }
+ *                       - { "0": 0.11106591671705246 }
+ *                       - { "0": 0.10246077179908752 }
+ *                       - { "0": 0.12191887944936752 }
+ *                       - { "0": 0.07655277103185654 }
+ *                       - { "0": 0.1191544383764267 }
+ *                       - { "0": 0.1222209483385086 }
+ *                       - { "0": 0.1222209483385086 }
+ *                       - { "0": 0.07456214725971222 }
+ *                       - { "0": 0.12198258191347122 }
+ *                       - { "0": 0.12204644829034805 }
+ *                       - { "0": 0.12056411802768707 }
+ *                       - { "0": 0.07456214725971222 }
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
+router.post('/api/analyze', async (req, res) => {
+  try {
+    const interactions = await fetchInteractions();
+    const processedData = processData(interactions);
+
+    trainModel(processedData);
+    const predictions = processedData.map(data => predict(data));
+
+    res.status(200).json({ predictions });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
